@@ -1,15 +1,17 @@
+package Logic;
+
 import java.util.Objects;
 
 public class Task {
 
-    String name;
-    String descriptionTask;
-    String status;
+    private String name;
+    private String description;
+    public String status;
 
-    public Task(String name, String descriptionTask, String status) {
+    public Task(String name, String description, String status) {
 
         this.name = name;
-        this.descriptionTask = descriptionTask;
+        this.description = description;
         this.status = status;
     }
 
@@ -18,19 +20,20 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return name.equals(task.name) && descriptionTask.equals(task.descriptionTask) && status.equals(task.status);
+        return name.equals(task.name) && description.equals(task.description)
+                && status.equals(task.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, descriptionTask, status);
+        return Objects.hash(name, description, status);
     }
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "Logic.Task{" +
                 "name='" + name + '\'' +
-                ", descriptionTask='" + descriptionTask + '\'' +
+                ", descriptionTask='" + description+ '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }
