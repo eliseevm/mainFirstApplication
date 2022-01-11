@@ -1,11 +1,12 @@
-package Logic;
+package logic;
 
-import Manager.Manager;
+import manager.Manager;
+
 
 public class Main {
     public static void main(String[] args) {
         Manager manager = new Manager();
+        }
     }
-}
 
 
