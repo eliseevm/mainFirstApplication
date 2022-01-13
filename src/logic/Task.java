@@ -4,10 +4,10 @@ import java.util.Objects;
 
 public class Task {
 
-    public String name;
-    public String description;
-    public String status;
-    public int id;
+    private String name;
+    private String description;
+    private String status;
+    private int id;
 
     public Task(String name, String description, String status, int id) {
         this.name = name;
@@ -19,12 +19,29 @@ public class Task {
     public Task(String name, String description, int id) {
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public int getId() {
+        return id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return name.equals(task.name) && description.equals(task.description) && status.equals(task.status);
+        return name.equals(task.name) && description.equals(task.description)
+                && status.equals(task.status);
     }
 
     @Override

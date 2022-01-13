@@ -27,6 +27,7 @@ public class Manager {
     public int getTaskId() {
         return taskId++;
     }
+
     public int getSubTaskId() {
         return subTaskId++;
     }
@@ -122,13 +123,13 @@ public class Manager {
     public void updateSubTask(SubTask subTask) {
         SubTask oldSubTask;
         for (Integer id : descriptionEpic.keySet()) {
-            if (subTask.epicId == id) {
+            if (subTask.getEpicId() == id) {
                 Epic epic = descriptionEpic.get(id);
                 for (int i = 0; i < epic.getListSubTask().size(); i++) {
                     oldSubTask = epic.getListSubTask().get(i);
-                    if (subTask.id == oldSubTask.id) {
-                        oldSubTask.name = subTask.name;
-                        oldSubTask.description = subTask.description;
+                    if (subTask.getId() == oldSubTask.getId()) {
+                        oldSubTask.setName(subTask.getName());
+                        oldSubTask.setDescription(subTask.getDescription());
                     }
                 }
             }
@@ -139,8 +140,8 @@ public class Manager {
     public void updateEpic(String name, String description, int epicId) {
         if (descriptionEpic.containsKey(epicId)) {
             Epic epic = descriptionEpic.get(epicId);
-            epic.name = name;
-            epic.description = description;
+            epic.setName(name);
+            epic.setDescription(description);
         }
     }
 

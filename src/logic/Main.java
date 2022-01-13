@@ -8,7 +8,6 @@ import java.util.Scanner;
 public class Main {
 
 
-
     public static void main(String[] args) {
         int command;
         int vybor;
@@ -44,7 +43,8 @@ public class Main {
             } else if (command == 3) {
                 System.out.println("Введите № эпика");
                 vybor = scanner.nextInt();
-                System.out.println("Это все подзадачи по эпику : " + manager.outputSubtaskByEpik(vybor));
+                System.out.println("Это все подзадачи по эпику : " + manager
+                        .outputSubtaskByEpik(vybor));
             } else if (command == 4) {
                 System.out.println("Введите №");
                 vybor = scanner.nextInt();
@@ -71,7 +71,7 @@ public class Main {
                 vybor = scanner.nextInt();
                 manager.inputNewSubTask(name3, description5, status4, vybor);
                 System.out.println(manager.getDescriptionEpic());
-                 Epic epic = manager.getDescriptionEpic().get(vybor);
+                Epic epic = manager.getDescriptionEpic().get(vybor);
                 System.out.println(epic.getListSubTask());
             } else if (command == 10) {
                 System.out.println("Введите № задачи ");
@@ -105,7 +105,6 @@ public class Main {
         }
     }
 
-
     static void printMenu() {
         System.out.println("1 - Получить все задачи");
         System.out.println("2 - Получить все эпики");
@@ -123,8 +122,6 @@ public class Main {
         System.out.println("14 - Удалить все задачи");
         System.out.println("0 - Завершить работу приложения.");
     }
-
-
 }
 
 

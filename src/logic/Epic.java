@@ -6,7 +6,10 @@ import java.util.Objects;
 public class Epic extends Task {
 
     private ArrayList<SubTask> listSubTask;
-    //private String status;
+    private String name;
+    private String description;
+    private String status;
+    private int id;
 
 
     public Epic(String name, String description, int id) {
@@ -20,6 +23,13 @@ public class Epic extends Task {
         this.status = getStatus();
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     public String toString() {
@@ -31,7 +41,7 @@ public class Epic extends Task {
     }
 
     public int getId() {
-        return id = id + 1;
+        return id;
     }
 
     public ArrayList<SubTask> getListSubTask() {
@@ -45,9 +55,9 @@ public class Epic extends Task {
             int s = 0;
             for (int i = 0; i < listSubTask.size(); i++) {
                 SubTask temp = listSubTask.get(i);
-                if (temp.status == "Done") {
+                if (temp.getStatus() == "Done") {
                     j = j + 1;
-                } else if (temp.status == "New") {
+                } else if (temp.getStatus() == "New") {
                     s = s + 1;
                 }
             }
