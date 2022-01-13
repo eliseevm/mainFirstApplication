@@ -4,30 +4,19 @@ import java.util.Objects;
 
 public class Task {
 
-    private String name;
-    private String description;
-    protected static String status;
-    private static int id = 0;
+    public String name;
+    public String description;
+    public String status;
+    public int id;
 
-    public Task(String name, String description, String status) {
+    public Task(String name, String description, String status, int id) {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.id = id;
     }
 
-    public Task(String name, String description) {
-    }
-
-    public static int getId() {
-        return id;
-    }
-
-    public static void setId(int id) {
-        Task.id = id;
-    }
-
-    public String getStatus() {
-        return status;
+    public Task(String name, String description, int id) {
     }
 
     @Override

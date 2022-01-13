@@ -1,48 +1,70 @@
 package logic;
 
-
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Objects;
 
 public class Epic extends Task {
-    private static HashMap<Integer, ArrayList<SubTask>> subtaskInEpic = new HashMap<>();
-    private static ArrayList<SubTask> listSubTask;
 
-    public Epic(String name, String description) {
-        super(name, description);
-        status = getEpicStatus();
-        listSubTask = new ArrayList<>(); // Список для подзадач прикрепляемых к эпику
+    private ArrayList<SubTask> listSubTask;
+    //private String status;
+
+
+    public Epic(String name, String description, int id) {
+        super(name, description, id);
+        this.listSubTask = listSubTask;
+
+        listSubTask = new ArrayList<>();
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = getStatus();
     }
 
-    public static void inputNewSubTask(String name, String description, String status, int epicId) {
-        int id = SubTask.getId();
-        listSubTask.add(new SubTask(name, description, status, epicId));
-        subtaskInEpic.put(epicId, listSubTask);
-        SubTask.setId(id + 1);
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
+                '}';
     }
 
-    public String getEpicStatus() { // Метод-установщик статуса эпика
-        String status = getStatus();
-        String indicator = " ";
-        for (Integer listr : subtaskInEpic.keySet()) {
-            ArrayList<SubTask> temp = subtaskInEpic.get(listr);
+    public int getId() {
+        return id = id + 1;
+    }
+
+    public ArrayList<SubTask> getListSubTask() {
+        return listSubTask;
+    }
+
+    public String getStatus() {
+
+        if (!(listSubTask.isEmpty())) {
             int j = 0;
-            for (int i = 0; i < temp.size(); i++) {
-                SubTask subTask = temp.get(i);
-                if ((subTask.getStatus()).equals("done")) {
-                    j = j++;
+            int s = 0;
+            for (int i = 0; i < listSubTask.size(); i++) {
+                SubTask temp = listSubTask.get(i);
+                if (temp.status == "Done") {
+                    j = j + 1;
+                } else if (temp.status == "New") {
+                    s = s + 1;
                 }
             }
-            if (j == temp.size()) {
-                indicator = "done";
-            } else if (j == 0) {
-                indicator = "new";
+            if (j == listSubTask.size()) {
+                status = "Done";
+            } else if (s == listSubTask.size()) {
+                status = "New";
             } else {
-                indicator = "in progress";
+                status = "in progress";
             }
+        } else {
+            status = "New";
         }
-        return indicator;
+        return status;
     }
+
+
 }
 
 

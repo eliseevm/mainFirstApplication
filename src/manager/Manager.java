@@ -12,10 +12,31 @@ public class Manager {
     private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач
     private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач
     private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
-    private HashMap<Integer, ArrayList<SubTask>> subtaskInEpic = new HashMap<>(); /* Перечень
-    подзадач по одному эпику. В качестве ключа Имя эпика */
+    private int taskId = 0;
+    private int subTaskId = 0;
+    private int epicId = 0;
+
+    public HashMap<Integer, Task> getDescriptionTasks() {
+        return descriptionTasks;
+    }
+
+    public HashMap<Integer, Epic> getDescriptionEpic() {
+        return descriptionEpic;
+    }
+
+    public int getTaskId() {
+        return taskId++;
+    }
+    public int getSubTaskId() {
+        return subTaskId++;
+    }
+
+    public int getEpicId() {
+        return epicId++;
+    }
 
 
+    // Метод возвращает все подзадачи
     public HashMap<Integer, SubTask> getDescriptionSubTasks() {
         return descriptionSubTasks;
     }
@@ -32,12 +53,10 @@ public class Manager {
 
     // Метод возвращает подзадачи по эпику
     public ArrayList<SubTask> outputSubtaskByEpik(int epicId) {
-        ArrayList<SubTask> temp = null;
-        if (subtaskInEpic.containsKey(epicId)) {
-            temp = subtaskInEpic.get(epicId);
-        }
-        return temp;
+        Epic listEpics = descriptionEpic.get(epicId);
+        return listEpics.getListSubTask();
     }
+
 
     // Метод возвращает задачи по ID
     public Task outputTaskById(int numberTask) {
@@ -69,40 +88,59 @@ public class Manager {
 
     // Метод ввода новой задачи
     public void inputNewTask(String name, String description, String status) {
-        int id = Task.getId();
-        descriptionTasks.put(id, new Task(name, description, status));
-        Task.setId(id + 1);
+        int id = getTaskId();
+        Task tasc = new Task(name, description, status, id);
+        descriptionTasks.put(id, tasc);
     }
 
     // Метод ввода нового эпика
     public void inputNewEpic(String name, String description) {
-        int id = Epic.getId();
-        descriptionEpic.put(id, new Epic(name, description));
-        Epic.setId(id + 1);
+        int id = getEpicId();
+        Epic epic = new Epic(name, description, id);
+        descriptionEpic.put(id, epic);
     }
-    public void createNewSubTask(String name, String description, String status, int epicId) {
-        Epic.inputNewSubTask (name, description, status,epicId);
+
+    // Метод ввода новой подзадачи
+    public void inputNewSubTask(String name, String description, String status, int epicId) {
+        int id = getSubTaskId();
+        Epic epic = descriptionEpic.get(epicId);
+        SubTask subTask = new SubTask(name, description, status, id, epicId);
+        epic.getListSubTask().add(subTask);
+        descriptionSubTasks.put(id, subTask);
+
+        epic.getStatus();
     }
 
     // Метод для обновления задач по номеру.
     public void updateTask(int id, String name, String description, String status) {
         if (descriptionTasks.containsKey(id)) { // Проверка на наличие в таблице указанного №
-            descriptionTasks.put(id, new Task(name, description, status));
+            descriptionTasks.put(id, new Task(name, description, status, id));
         }
     }
 
     // Метод для обновления подзадач по номеру.
-    public void updateSubTask(int id, String name, String description, String status, int epicId) {
-        if (descriptionSubTasks.containsKey(id)) {
-            descriptionSubTasks.put(id, new SubTask(name, description, status, epicId));
-            // Здесь как то надо инициировать проверку эпика на предмет изменения статуса
+    public void updateSubTask(SubTask subTask) {
+        SubTask oldSubTask;
+        for (Integer id : descriptionEpic.keySet()) {
+            if (subTask.epicId == id) {
+                Epic epic = descriptionEpic.get(id);
+                for (int i = 0; i < epic.getListSubTask().size(); i++) {
+                    oldSubTask = epic.getListSubTask().get(i);
+                    if (subTask.id == oldSubTask.id) {
+                        oldSubTask.name = subTask.name;
+                        oldSubTask.description = subTask.description;
+                    }
+                }
+            }
         }
     }
 
     // Метод для обновления эпика по номеру.
     public void updateEpic(String name, String description, int epicId) {
         if (descriptionEpic.containsKey(epicId)) {
-            descriptionEpic.put(epicId, new Epic(name, description));
+            Epic epic = descriptionEpic.get(epicId);
+            epic.name = name;
+            epic.description = description;
         }
     }
 
