@@ -20,6 +20,10 @@ public class Manager {
         return descriptionTasks;
     }
 
+    public HashMap<Integer, SubTask> getDescriptionSubTasks() {
+        return descriptionSubTasks;
+    }
+
     public HashMap<Integer, Epic> getDescriptionEpic() {
         return descriptionEpic;
     }
@@ -55,20 +59,17 @@ public class Manager {
 
     // Метод возвращает задачи по ID
     public Task outputTaskById(int numberTask) {
-        Task request = descriptionTasks.get(numberTask);
-        return request;
+       return descriptionTasks.get(numberTask);
     }
 
     // Метод возвращает подзадачи по ID
     public SubTask outputSubTaskById(int numberTask) {
-        SubTask request = descriptionSubTasks.get(numberTask);
-        return request;
+        return descriptionSubTasks.get(numberTask);
     }
 
     // Метод возвращает эпик по ID
     public Epic outputEpicById(int numberTask) {
-        Epic request = descriptionEpic.get(numberTask);
-        return request;
+        return descriptionEpic.get(numberTask);
     }
 
     // Метод ввода новой задачи
@@ -80,6 +81,7 @@ public class Manager {
 
     // Метод ввода нового эпика
     public void inputNewEpic(String name, String description) {
+        System.out.println(name + description);
         int id = getEpicId();
         Epic epic = new Epic(name, description, id);
         descriptionEpic.put(id, epic);
@@ -92,15 +94,14 @@ public class Manager {
         SubTask subTask = new SubTask(name, description, status, id, epicId);
         epic.getListSubTask().add(subTask);
         descriptionSubTasks.put(id, subTask);
-        epic.getStatus();
     }
 
     // Метод для обновления задач по номеру.
-    public void updateTask(int id, String name, String description, String status) {
-        if (descriptionTasks.containsKey(id)) { // Проверка на наличие в таблице указанного №
-            descriptionTasks.put(id, new Task(name, description, status, id));
-        }
+    public void updateTask(Task task) {
+        int id = task.getId();
+        descriptionTasks.put(id, task);
     }
+
 
     // Метод для обновления подзадач по номеру.
     public void updateSubTask(SubTask subTask) {
@@ -120,12 +121,9 @@ public class Manager {
     }
 
     // Метод для обновления эпика по номеру.
-    public void updateEpic(String name, String description, int epicId) {
-        if (descriptionEpic.containsKey(epicId)) {
-            Epic epic = descriptionEpic.get(epicId);
-            epic.setName(name);
-            epic.setDescription(description);
-        }
+    public void updateEpic(Epic epic) {
+        int id = epic.getId();
+        descriptionEpic.put(id, epic);
     }
 
     // Метод удаления задачи по номеру

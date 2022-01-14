@@ -1,46 +1,48 @@
 package logic;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
 
     private ArrayList<SubTask> listSubTask;
-    private String name;
-    private String description;
-    private String status;
-    private int id;
 
     public Epic(String name, String description, int id) {
         super(name, description, id);
         listSubTask = new ArrayList<>();
-        this.name = name;
-        this.description = description;
-        this.id = id;
-        this.status = getStatus();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public String toString() {
-        return "Epic{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status='" + getStatus() + '\'' +
-                '}';
     }
 
     public ArrayList<SubTask> getListSubTask() {
         return listSubTask;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Epic epic = (Epic) o;
+        return listSubTask.equals(epic.listSubTask);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), listSubTask);
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status='" + getStatus() + '\'' +
+                ", id=" + getId() +
+                '}';
+    }
+
+    @Override
     public String getStatus() {
+        String status = "";
         if (!(listSubTask.isEmpty())) {
             int j = 0;
             int s = 0;

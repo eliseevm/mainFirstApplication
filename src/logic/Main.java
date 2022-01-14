@@ -10,20 +10,15 @@ public class Main {
         int command;
         int vybor;
         int idO = 0;
-        int idi = 0;
-        int epicIdi = 1;
         int epicIdiO = 0;
         String name = "Это задача";
         String name2 = "Это эпик";
         String name3 = "Это подзадача";
         String nameO = "Обновилась Sub";
-        String name5 = "Обновилось имя эпика";
         String description = "Описание задачи";
         String description4 = "Описание Эпика";
         String description5 = "Описание подзадачи";
-        String description6 = "Обновился описание эпика";
         String descriptionO = "Обновился Sub";
-        int numberTask = 0;
         String status = "Done";
         String statusO = "New";
         String status4 = "Done";
@@ -72,23 +67,19 @@ public class Main {
                 Epic epic = manager.getDescriptionEpic().get(vybor);
                 System.out.println(epic.getListSubTask());
             } else if (command == 10) {
-                System.out.println("Введите № задачи ");
-                vybor = scanner.nextInt();
-                manager.updateTask(vybor, name2, description, status);
+                Task task = new Task(nameO, descriptionO, statusO, idO);
+                manager.updateTask(task);
                 System.out.println(manager.getDescriptionTasks());
             } else if (command == 11) {
-                System.out.println("Введите № Эпика ");
-                vybor = scanner.nextInt();
-                manager.updateEpic(name5, description6, vybor);
+                Epic epic = new Epic(nameO, descriptionO, idO);
+                manager.updateEpic(epic);
                 System.out.println(manager.getDescriptionEpic());
-                Epic epic = manager.getDescriptionEpic().get(vybor);
-                System.out.println(epic.getListSubTask());
             } else if (command == 12) {
                 System.out.println("начало 12");
                 SubTask subTask = new SubTask(nameO, descriptionO, statusO, idO, epicIdiO);
                 manager.updateSubTask(subTask);
                 Epic epic = manager.getDescriptionEpic().get(epicIdiO);
-                System.out.println(epic.getListSubTask());
+                System.out.println(manager.getDescriptionSubTasks());
                 System.out.println("конец 12");
             } else if (command == 13) {
                 System.out.println("Введите № задачи ");
