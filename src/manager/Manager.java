@@ -36,12 +36,6 @@ public class Manager {
         return epicId++;
     }
 
-
-    // Метод возвращает все подзадачи
-    public HashMap<Integer, SubTask> getDescriptionSubTasks() {
-        return descriptionSubTasks;
-    }
-
     // Метод возвращает все задачи
     public HashMap<Integer, Task> outputAllTask() {
         return descriptionTasks;
@@ -61,29 +55,19 @@ public class Manager {
 
     // Метод возвращает задачи по ID
     public Task outputTaskById(int numberTask) {
-        Task request = null;
-        if (descriptionTasks.containsKey(numberTask)) {
-            request = descriptionTasks.get(numberTask);
-        }
+        Task request = descriptionTasks.get(numberTask);
         return request;
     }
 
     // Метод возвращает подзадачи по ID
     public SubTask outputSubTaskById(int numberTask) {
-        SubTask request = null;
-        if (descriptionSubTasks.containsKey(numberTask)) {
-            request = descriptionSubTasks.get(numberTask);
-        }
+        SubTask request = descriptionSubTasks.get(numberTask);
         return request;
     }
 
     // Метод возвращает эпик по ID
     public Epic outputEpicById(int numberTask) {
-        Epic request = null;
-        if (descriptionEpic.containsKey(numberTask)) {
-            descriptionEpic.get(numberTask);
-            request = descriptionEpic.get(numberTask);
-        }
+        Epic request = descriptionEpic.get(numberTask);
         return request;
     }
 
@@ -108,7 +92,6 @@ public class Manager {
         SubTask subTask = new SubTask(name, description, status, id, epicId);
         epic.getListSubTask().add(subTask);
         descriptionSubTasks.put(id, subTask);
-
         epic.getStatus();
     }
 
@@ -144,7 +127,6 @@ public class Manager {
             epic.setDescription(description);
         }
     }
-
 
     // Метод удаления задачи по номеру
     public void deletTaskById(int numberTask) {

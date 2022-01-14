@@ -1,7 +1,5 @@
 package logic;
 
-import java.util.Objects;
-
 public class SubTask extends Task {
 
     private int epicId;

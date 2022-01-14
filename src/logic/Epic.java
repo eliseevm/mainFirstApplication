@@ -1,7 +1,6 @@
 package logic;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class Epic extends Task {
 
@@ -11,11 +10,8 @@ public class Epic extends Task {
     private String status;
     private int id;
 
-
     public Epic(String name, String description, int id) {
         super(name, description, id);
-        this.listSubTask = listSubTask;
-
         listSubTask = new ArrayList<>();
         this.name = name;
         this.description = description;
@@ -36,12 +32,8 @@ public class Epic extends Task {
         return "Epic{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", status='" + getStatus() + '\'' +
                 '}';
-    }
-
-    public int getId() {
-        return id;
     }
 
     public ArrayList<SubTask> getListSubTask() {
@@ -49,7 +41,6 @@ public class Epic extends Task {
     }
 
     public String getStatus() {
-
         if (!(listSubTask.isEmpty())) {
             int j = 0;
             int s = 0;
@@ -73,8 +64,6 @@ public class Epic extends Task {
         }
         return status;
     }
-
-
 }
 
 
