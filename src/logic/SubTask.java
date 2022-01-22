@@ -1,5 +1,7 @@
 package logic;
 
+import manager.Status;
+
 import java.util.Objects;
 
 public class SubTask extends Task {
@@ -7,7 +9,7 @@ public class SubTask extends Task {
     private int epicId;
 
 
-    public SubTask(String name, String description, String status, int id, int epicId) {
+    public SubTask(String name, String description, Status status, int id, int epicId) {
         super(name, description, status, id);
         this.epicId = epicId;
     }
@@ -33,10 +35,7 @@ public class SubTask extends Task {
     @Override
     public String toString() {
         return "SubTask{" +
-                "name='" + getName() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", status='" + getStatus() + '\'' +
-                ", id=" + getId() +
+                "epicId=" + epicId +
                 '}';
     }
 }

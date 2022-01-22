@@ -1,5 +1,7 @@
 package logic;
 
+import manager.Status;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -33,36 +35,33 @@ public class Epic extends Task {
     @Override
     public String toString() {
         return "Epic{" +
-                "name='" + getName() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", status='" + getStatus() + '\'' +
-                ", id=" + getId() +
+                "listSubTask=" + listSubTask +
                 '}';
     }
 
     @Override
-    public String getStatus() {
-        String status = "";
+    public Status getStatus() {
+        Status status = Status.NEW;
         if (!(listSubTask.isEmpty())) {
             int j = 0;
             int s = 0;
             for (int i = 0; i < listSubTask.size(); i++) {
                 SubTask temp = listSubTask.get(i);
-                if (temp.getStatus() == "Done") {
+                if (temp.getStatus().equals(Status.DONE)) {
                     j = j + 1;
-                } else if (temp.getStatus() == "New") {
+                } else if (temp.getStatus().equals(Status.NEW)) {
                     s = s + 1;
                 }
             }
             if (j == listSubTask.size()) {
-                status = "Done";
+                status = Status.DONE;
             } else if (s == listSubTask.size()) {
-                status = "New";
+                status = Status.NEW;
             } else {
-                status = "in progress";
+                status = Status.IN_PROGRESS;
             }
         } else {
-            status = "New";
+            status = Status.NEW;
         }
         return status;
     }

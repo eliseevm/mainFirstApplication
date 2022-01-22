@@ -1,15 +1,17 @@
 package logic;
 
+import manager.Status;
+
 import java.util.Objects;
 
 public class Task {
 
     private String name;
     private String description;
-    private String status;
+    private Status status;
     private int id;
 
-    public Task(String name, String description, String status, int id) {
+    public Task(String name, String description, Status status, int id) {
         this.name = name;
         this.description = description;
         this.status = status;
@@ -30,7 +32,7 @@ public class Task {
         return description;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -46,13 +48,17 @@ public class Task {
         this.description = description;
     }
 
+    public void setStatus(Status newStatus) {
+        status = newStatus;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return id == task.id && name.equals(task.name) && description.equals(task.description)
-                && status.equals(task.status);
+                && status == task.status;
     }
 
     @Override
@@ -65,7 +71,8 @@ public class Task {
         return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", status=" + status +
+                ", id=" + id +
                 '}';
     }
 }

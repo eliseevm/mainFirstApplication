@@ -1,7 +1,9 @@
 package logic;
 
-import manager.Manager;
+import manager.InMemoryTaskManager;
+import manager.Status;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -19,10 +21,10 @@ public class Main {
         String description4 = "Описание Эпика";
         String description5 = "Описание подзадачи";
         String descriptionO = "Обновился Sub";
-        String status = "Done";
-        String statusO = "New";
-        String status4 = "Done";
-        Manager manager = new Manager();
+        Status status = Status.NEW;
+        Status status0 = Status.DONE;
+        Status status4 = Status.DONE;
+        InMemoryTaskManager manager = new InMemoryTaskManager();
         System.out.println("Привет");
         System.out.println("Сделай свой выбор");
         while (true) {
@@ -67,7 +69,7 @@ public class Main {
                 Epic epic = manager.getDescriptionEpic().get(vybor);
                 System.out.println(epic.getListSubTask());
             } else if (command == 10) {
-                Task task = new Task(nameO, descriptionO, statusO, idO);
+                Task task = new Task(nameO, descriptionO, status0, idO);
                 manager.updateTask(task);
                 System.out.println(manager.getDescriptionTasks());
             } else if (command == 11) {
@@ -76,7 +78,7 @@ public class Main {
                 System.out.println(manager.getDescriptionEpic());
             } else if (command == 12) {
                 System.out.println("начало 12");
-                SubTask subTask = new SubTask(nameO, descriptionO, statusO, idO, epicIdiO);
+                SubTask subTask = new SubTask(nameO, descriptionO, status0, idO, epicIdiO);
                 manager.updateSubTask(subTask);
                 Epic epic = manager.getDescriptionEpic().get(epicIdiO);
                 System.out.println(manager.getDescriptionSubTasks());
@@ -88,6 +90,11 @@ public class Main {
                 System.out.println(manager.getDescriptionTasks());
             } else if (command == 14) {
                 manager.deletAllTasks();
+            } else if (command == 15) {
+                List<Task> histor = InMemoryTaskManager.history();
+                for (Task output : histor) {
+                    System.out.println(output);
+                }
             } else if (command == 0) {
                 break;
             }
@@ -109,6 +116,7 @@ public class Main {
         System.out.println("12 - Обновить подзадачу по ID");
         System.out.println("13 - Удалить задачу по номеру");
         System.out.println("14 - Удалить все задачи");
+        System.out.println("15 - Посмотреть историю задач");
         System.out.println("0 - Завершить работу приложения.");
     }
 }
