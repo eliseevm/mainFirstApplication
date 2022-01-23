@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private static List<Task> historis = new ArrayList<>(); // История просмотра задач
+    private static List<Task> history = new ArrayList<>(); // История просмотра задач
     private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач
     private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач
     private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
@@ -20,51 +20,56 @@ public class InMemoryTaskManager implements TaskManager {
     private int epicId = 0;
 
     // Метод возвращает последние 10 задач
-    public static List<Task> history() {
-        return historis;
+    public List<Task> getHistory() {
+        return history;
     }
 
     // Метод добавляет задачу в список "история"
-    public static void addTaskInHistory(Task forAdd) {
-        if (historis.size() < 10) {
-            historis.add(forAdd);
-        } else {
-            historis.remove(0);
-            historis.add(forAdd);
-        }
-    }
-// Метод удаления задачи из истории просмотра задач
-    public static  void deletTask(Task delete) {
-        if (historis.contains(delete)) {
-            historis.remove(delete);
+    public void addTaskInHistory(Task forAdd) {
+        history.add(forAdd);
+        if (history.size() > 10) {
+            history.remove(0);
         }
     }
 
+    // Метод удаления задачи из истории просмотра задач
+    public static void deletTask(Task delete) {
+        if (history.contains(delete)) {
+            history.remove(delete);
+        }
+    }
+
+    // Метод возвращает перечень задач
     @Override
     public HashMap<Integer, Task> getDescriptionTasks() {
         return descriptionTasks;
     }
 
+    // Метод возвращает перечень подзадач
     @Override
     public HashMap<Integer, SubTask> getDescriptionSubTasks() {
         return descriptionSubTasks;
     }
 
+    // Перечень возвращает перечень эпиков
     @Override
     public HashMap<Integer, Epic> getDescriptionEpic() {
         return descriptionEpic;
     }
 
+    // Метод получения номера для задачи
     @Override
     public int getTaskId() {
         return taskId++;
     }
 
+    // Метод получения номера для подзадачи
     @Override
     public int getSubTaskId() {
         return subTaskId++;
     }
 
+    // Метод получения номера для эпика
     @Override
     public int getEpicId() {
         return epicId++;
@@ -88,7 +93,6 @@ public class InMemoryTaskManager implements TaskManager {
         Epic listEpics = descriptionEpic.get(epicId);
         return listEpics.getListSubTask();
     }
-
 
     // Метод возвращает задачи по ID
     @Override
@@ -145,7 +149,6 @@ public class InMemoryTaskManager implements TaskManager {
         descriptionTasks.put(id, task);
     }
 
-
     // Метод для обновления подзадач по номеру.
     @Override
     public void updateSubTask(SubTask subTask) {
@@ -184,7 +187,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deletAllTasks() {
         descriptionTasks.clear();
-        historis.clear();
+        history.clear();
     }
 
     @Override

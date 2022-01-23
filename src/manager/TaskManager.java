@@ -1,6 +1,5 @@
 package manager;
 
-
 import logic.Epic;
 import logic.SubTask;
 import logic.Task;
@@ -10,17 +9,22 @@ import java.util.HashMap;
 
 public interface TaskManager {
 
+    // Метод возвращает описание задачи
     HashMap<Integer, Task> getDescriptionTasks();
 
+    // Метод возвращает описание подзадачи
     HashMap<Integer, SubTask> getDescriptionSubTasks();
 
+    // Метод возвращает описание эпика
     HashMap<Integer, Epic> getDescriptionEpic();
 
+    // Метод получает номер ID для задачи
     int getTaskId();
 
+    // Метод получает номер ID для подзадачи
     int getSubTaskId();
 
-
+    // Метод получает номер ID для эпика
     int getEpicId();
 
     // Метод возвращает все задачи

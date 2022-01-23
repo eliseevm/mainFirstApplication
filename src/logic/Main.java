@@ -91,7 +91,7 @@ public class Main {
             } else if (command == 14) {
                 manager.deletAllTasks();
             } else if (command == 15) {
-                List<Task> histor = InMemoryTaskManager.history();
+                List<Task> histor = manager.getHistory();
                 for (Task output : histor) {
                     System.out.println(output);
                 }
