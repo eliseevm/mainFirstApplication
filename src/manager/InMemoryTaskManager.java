@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private static List<Task> history = new ArrayList<>(); // История просмотра задач
+    private List<Task> history = new ArrayList<>(); // История просмотра задач
     private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач
     private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач
     private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
@@ -25,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Метод добавляет задачу в список "история"
-    public void addTaskInHistory(Task forAdd) {
+    void addTaskInHistory(Task forAdd) {
         history.add(forAdd);
         if (history.size() > 10) {
             history.remove(0);
@@ -33,7 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Метод удаления задачи из истории просмотра задач
-    public static void deletTask(Task delete) {
+    void deletTask(Task delete) {
         if (history.contains(delete)) {
             history.remove(delete);
         }
