@@ -25,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Метод добавляет задачу в список "история"
-    void addTaskInHistory(Task forAdd) {
+    private void addTaskInHistory(Task forAdd) {
         history.add(forAdd);
         if (history.size() > 10) {
             history.remove(0);
@@ -33,7 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Метод удаления задачи из истории просмотра задач
-    void deletTask(Task delete) {
+    private void deletTask(Task delete) {
         if (history.contains(delete)) {
             history.remove(delete);
         }
