@@ -3,40 +3,36 @@ package manager;
 import logic.Epic;
 import logic.SubTask;
 import logic.Task;
-++++++_____
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
-public class InMemoryTaskManager implements TaskManager {
+import java.util.*;
 
+public class InMemoryTaskManager implements TaskManager, HistoryManager {
+
+    private LinkedList<Task> test = new LinkedList<>();
     private List<Task> history = new ArrayList<>(); // История просмотра задач
     private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач
     private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач
     private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
-    private int taskId = 0;
-    private int subTaskId = 0;
-    private int epicId = 0;
+    private int taskId = 0; // Cчетчик задач
+    private int subTaskId = 0; // Счетчик подзадач
+    private int epicId = 0; // Счетчик эпиков
+    private Node<Task> head; // Голова двусвязного списка
+    private Node<Task> tail; // Хвост двусвязного списка
+    private int size = 0; // Размер двусвязного списка
+
+    @Override
+    public void add(Task task) {
+        linkLast(task);
+    }
+
+    @Override
+    public void remove(int id) {
+    }
 
     // Метод возвращает последние 10 задач
+    @Override
     public List<Task> getHistory() {
-        return history;
-    }
-
-    // Метод добавляет задачу в список "история"
-    private void addTaskInHistory(Task forAdd) {
-        history.add(forAdd);
-        if (history.size() > 10) {
-            history.remove(0);
-        }
-    }
-
-    // Метод удаления задачи из истории просмотра задач
-    private void deletTask(Task delete) {
-        if (history.contains(delete)) {
-            history.remove(delete);
-        }
+        return getTasks();
     }
 
     // Метод возвращает перечень задач
@@ -97,22 +93,21 @@ public class InMemoryTaskManager implements TaskManager {
     // Метод возвращает задачи по ID
     @Override
     public Task outputTaskById(int numberTask) {
-        Task temp = (descriptionTasks.get(numberTask));
-        addTaskInHistory(temp);
+        add(descriptionTasks.get(numberTask));
         return descriptionTasks.get(numberTask);
     }
 
     // Метод возвращает подзадачи по ID
     @Override
     public SubTask outputSubTaskById(int numberTask) {
-        addTaskInHistory(descriptionSubTasks.get(numberTask));
+        add(descriptionSubTasks.get(numberTask));
         return descriptionSubTasks.get(numberTask);
     }
 
     // Метод возвращает эпик по ID
     @Override
     public Epic outputEpicById(int numberTask) {
-        addTaskInHistory(descriptionEpic.get(numberTask));
+        add(descriptionEpic.get(numberTask));
         return descriptionEpic.get(numberTask);
     }
 
@@ -140,6 +135,14 @@ public class InMemoryTaskManager implements TaskManager {
         SubTask subTask = new SubTask(name, description, status, id, epicId);
         epic.getListSubTask().add(subTask);
         descriptionSubTasks.put(id, subTask);
+    }
+
+    // Метод добавляет задачу в список "история просмотренных задач"
+    private void addTaskInHistory(Task forAdd) {
+        history.add(forAdd);
+        if (history.size() > 10) {
+            history.remove(0);
+        }
     }
 
     // Метод для обновления задач по номеру.
@@ -190,6 +193,13 @@ public class InMemoryTaskManager implements TaskManager {
         history.clear();
     }
 
+    // Метод удаления задачи из истории просмотра задач
+    private void deletTask(Task delete) {
+        if (history.contains(delete)) {
+            history.remove(delete);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -217,6 +227,57 @@ public class InMemoryTaskManager implements TaskManager {
                 ", subTaskId=" + subTaskId +
                 ", epicId=" + epicId +
                 '}';
+    }
+
+
+    public class Node<T> {
+
+        public T data;
+        public Node<T> next;
+        public Node<T> prev;
+
+        public Node(Node<T> oldHead, T element, Node<T> oldTail) {
+            this.data = element;
+            this.prev = oldTail;
+            this.next = oldHead;
+        }
+
+        public Node<T> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<T> next) {
+            this.next = next;
+        }
+    }
+
+    public void linkLast(Task element) {
+        final Node<Task> oldTail = tail;
+        final Node<Task> newNode = new Node<>(null, element, oldTail);
+        tail = newNode;
+        if (oldTail == null)
+            head = newNode;
+        else oldTail.next = newNode;
+        size++;
+    }
+
+    // Метод получения размера двусвязного списка
+    public int size() {
+        return test.size();
+    }
+
+    // Метод получения задач из двусвязного списка
+    public List<Task> getTasks() {
+        List<Task> taskList = new ArrayList<>();
+        Node<Task> element = head;
+        while (element != null) {
+            taskList.add(element.data);
+            element = element.getNext();
+        }
+        return taskList;
+    }
+    public void removeNode(Task element) {
+
     }
 }
 

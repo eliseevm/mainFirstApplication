@@ -6,7 +6,7 @@ import logic.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-++++++_______
+
 public interface TaskManager {
 
     // Метод возвращает описание задачи

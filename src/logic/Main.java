@@ -1,5 +1,5 @@
 package logic;
-++++++++_____
+
 import manager.InMemoryTaskManager;
 import manager.Status;
 
@@ -116,7 +116,7 @@ public class Main {
         System.out.println("12 - Обновить подзадачу по ID");
         System.out.println("13 - Удалить задачу по номеру");
         System.out.println("14 - Удалить все задачи");
-        System.out.println("15 - Посмотреть историю задач");
+        System.out.println("15 - Посмотреть историю просмотра задач");
         System.out.println("0 - Завершить работу приложения.");
     }
 }
