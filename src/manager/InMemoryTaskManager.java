@@ -8,28 +8,43 @@ import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager, HistoryManager {
 
-    private LinkedList<Task> test = new LinkedList<>();
-    private List<Task> history = new ArrayList<>(); // История просмотра задач
+    private LinkedList<Node<Task>> test = new LinkedList<>(); // Двусвязный список
+    private HashMap<Integer, Node<Task>> tempNodeMap = new HashMap<>(); /* Вспомогательная таблица
+    для извлечения из двусвязного списка */
     private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач
     private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач
     private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
     private int taskId = 0; // Cчетчик задач
-    private int subTaskId = 0; // Счетчик подзадач
-    private int epicId = 0; // Счетчик эпиков
     private Node<Task> head; // Голова двусвязного списка
     private Node<Task> tail; // Хвост двусвязного списка
     private int size = 0; // Размер двусвязного списка
 
+    /* Метод добавляет новый и удаляет старый двойник элемента из всех коллекций хранящих историю
+    просмотра задач */
     @Override
     public void add(Task task) {
-        linkLast(task);
+        int taskId = task.getId();
+        if (tempNodeMap.containsKey(taskId)) {
+            Node<Task> tempNode = tempNodeMap.get(taskId);
+            remove(taskId);
+            removeNode(tempNode);
+            linkLast(task);
+            Node<Task> tempNode1 = this.tail;
+            tempNodeMap.put(taskId, tempNode1);
+        } else {
+            linkLast(task);
+            Node<Task> tempNode = tail;
+            tempNodeMap.put(taskId, tempNode);
+        }
     }
 
+    // Метод удаления объекта из вспомогательного списка истории просмотра
     @Override
     public void remove(int id) {
+        tempNodeMap.remove(id);
     }
 
-    // Метод возвращает последние 10 задач
+    // Метод возвращает перечень просмотренных задач
     @Override
     public List<Task> getHistory() {
         return getTasks();
@@ -57,18 +72,6 @@ public class InMemoryTaskManager implements TaskManager, HistoryManager {
     @Override
     public int getTaskId() {
         return taskId++;
-    }
-
-    // Метод получения номера для подзадачи
-    @Override
-    public int getSubTaskId() {
-        return subTaskId++;
-    }
-
-    // Метод получения номера для эпика
-    @Override
-    public int getEpicId() {
-        return epicId++;
     }
 
     // Метод возвращает все задачи
@@ -122,7 +125,7 @@ public class InMemoryTaskManager implements TaskManager, HistoryManager {
     // Метод ввода нового эпика
     @Override
     public void inputNewEpic(String name, String description) {
-        int id = getEpicId();
+        int id = getTaskId();
         Epic epic = new Epic(name, description, id);
         descriptionEpic.put(id, epic);
     }
@@ -130,19 +133,11 @@ public class InMemoryTaskManager implements TaskManager, HistoryManager {
     // Метод ввода новой подзадачи
     @Override
     public void inputNewSubTask(String name, String description, Status status, int epicId) {
-        int id = getSubTaskId();
+        int id = getTaskId();
         Epic epic = descriptionEpic.get(epicId);
         SubTask subTask = new SubTask(name, description, status, id, epicId);
         epic.getListSubTask().add(subTask);
         descriptionSubTasks.put(id, subTask);
-    }
-
-    // Метод добавляет задачу в список "история просмотренных задач"
-    private void addTaskInHistory(Task forAdd) {
-        history.add(forAdd);
-        if (history.size() > 10) {
-            history.remove(0);
-        }
     }
 
     // Метод для обновления задач по номеру.
@@ -180,23 +175,26 @@ public class InMemoryTaskManager implements TaskManager, HistoryManager {
     // Метод удаления задачи по номеру
     @Override
     public void deletTaskById(int numberTask) {
-        if (descriptionTasks.containsKey(numberTask)) {
-            descriptionTasks.remove(numberTask);
-            deletTask(descriptionTasks.get(numberTask));
+        if (tempNodeMap.containsKey(numberTask)) {
+            if (descriptionTasks.containsKey(numberTask)) {
+                Node<Task> tempNode = tempNodeMap.get(numberTask);
+                remove(numberTask);
+                removeNode(tempNode);
+                descriptionTasks.remove(numberTask);
+            } else if (descriptionEpic.containsKey(numberTask)) {
+                Node<Task> tempNode = tempNodeMap.get(numberTask);
+                remove(numberTask);
+                removeNode(tempNode);
+                descriptionEpic.remove(numberTask);
+            }
         }
     }
 
     // Метод удаления всех задач
     @Override
     public void deletAllTasks() {
-        descriptionTasks.clear();
-        history.clear();
-    }
-
-    // Метод удаления задачи из истории просмотра задач
-    private void deletTask(Task delete) {
-        if (history.contains(delete)) {
-            history.remove(delete);
+        for (Integer id : descriptionTasks.keySet()) {
+            deletTaskById(id);
         }
     }
 
@@ -205,80 +203,97 @@ public class InMemoryTaskManager implements TaskManager, HistoryManager {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InMemoryTaskManager that = (InMemoryTaskManager) o;
-        return taskId == that.taskId && subTaskId == that.subTaskId && epicId == that.epicId
+        return taskId == that.taskId && size == that.size && test.equals(that.test)
+                && tempNodeMap.equals(that.tempNodeMap)
                 && descriptionTasks.equals(that.descriptionTasks)
                 && descriptionSubTasks.equals(that.descriptionSubTasks)
-                && descriptionEpic.equals(that.descriptionEpic);
+                && descriptionEpic.equals(that.descriptionEpic)
+                && head.equals(that.head) && tail.equals(that.tail);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(descriptionTasks, descriptionSubTasks, descriptionEpic
-                , taskId, subTaskId, epicId);
+        return Objects.hash(test, tempNodeMap, descriptionTasks, descriptionSubTasks
+                , descriptionEpic, taskId, head, tail, size);
     }
 
     @Override
     public String toString() {
         return "InMemoryTaskManager{" +
-                "descriptionTasks=" + descriptionTasks +
+                "test=" + test +
+                ", tempNodeMap=" + tempNodeMap +
+                ", descriptionTasks=" + descriptionTasks +
                 ", descriptionSubTasks=" + descriptionSubTasks +
                 ", descriptionEpic=" + descriptionEpic +
                 ", taskId=" + taskId +
-                ", subTaskId=" + subTaskId +
-                ", epicId=" + epicId +
+                ", head=" + head +
+                ", tail=" + tail +
+                ", size=" + size +
                 '}';
     }
 
-
+    // Класс реализации объектов для двусвязного списка
     public class Node<T> {
 
         public T data;
         public Node<T> next;
         public Node<T> prev;
 
-        public Node(Node<T> oldHead, T element, Node<T> oldTail) {
+        public Node(Node<T> newNext, T element, Node<T> newPrev) {
             this.data = element;
-            this.prev = oldTail;
-            this.next = oldHead;
-        }
-
-        public Node<T> getNext() {
-            return next;
-        }
-
-        public void setNext(Node<T> next) {
-            this.next = next;
+            this.prev = newPrev;
+            this.next = newNext;
         }
     }
 
+    // Метод добавления узла в конец двусвязного списока
     public void linkLast(Task element) {
-        final Node<Task> oldTail = tail;
+        final Node<Task> oldTail = this.tail;
         final Node<Task> newNode = new Node<>(null, element, oldTail);
-        tail = newNode;
+        this.tail = newNode;
         if (oldTail == null)
             head = newNode;
-        else oldTail.next = newNode;
+        else
+            oldTail.next = newNode;
         size++;
     }
 
-    // Метод получения размера двусвязного списка
-    public int size() {
-        return test.size();
-    }
-
-    // Метод получения задач из двусвязного списка
+    // Метод получения всех узлов из двусвязного списка
     public List<Task> getTasks() {
         List<Task> taskList = new ArrayList<>();
-        Node<Task> element = head;
+        Node<Task> element = this.head;
         while (element != null) {
             taskList.add(element.data);
-            element = element.getNext();
+            element = element.next;
         }
         return taskList;
     }
-    public void removeNode(Task element) {
 
+    // Метод удаления узла из двусвязного списка
+    public void removeNode(Node<Task> element) {
+        final Node<Task> next = element.next;
+        final Node<Task> prev = element.prev;
+
+        if (prev == null) {
+            head = next;
+        } else {
+            prev.next = next;
+            element.prev = null;
+        }
+
+        if (next == null) {
+            tail = prev;
+        } else {
+            next.prev = prev;
+            element.next = null;
+        }
+
+        element.data = null;
+        size--;
     }
 }
+
+
+
 
 

@@ -21,12 +21,6 @@ public interface TaskManager {
     // Метод получает номер ID для задачи
     int getTaskId();
 
-    // Метод получает номер ID для подзадачи
-    int getSubTaskId();
-
-    // Метод получает номер ID для эпика
-    int getEpicId();
-
     // Метод возвращает все задачи
     HashMap<Integer, Task> outputAllTask();
 

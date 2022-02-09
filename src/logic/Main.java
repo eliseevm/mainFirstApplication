@@ -3,6 +3,7 @@ package logic;
 import manager.InMemoryTaskManager;
 import manager.Status;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -114,7 +115,7 @@ public class Main {
         System.out.println("10 - Обновить задачу по ID");
         System.out.println("11 - Обновить эпик по ID");
         System.out.println("12 - Обновить подзадачу по ID");
-        System.out.println("13 - Удалить задачу по номеру");
+        System.out.println("13 - Удалить задачу или эпик по ID номеру");
         System.out.println("14 - Удалить все задачи");
         System.out.println("15 - Посмотреть историю просмотра задач");
         System.out.println("0 - Завершить работу приложения.");
