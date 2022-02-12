@@ -6,6 +6,7 @@ import logic.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public interface TaskManager {
 
@@ -20,6 +21,8 @@ public interface TaskManager {
 
     // Метод получает номер ID для задачи
     int getTaskId();
+
+    List<Task> getHistory();
 
     // Метод возвращает все задачи
     HashMap<Integer, Task> outputAllTask();
