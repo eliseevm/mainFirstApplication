@@ -12,7 +12,8 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач
     private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач
     private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
-    InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    private InMemoryHistoryManager historyManager = new InMemoryHistoryManager(); // Создаем новый
+    // объект класса
 
     private int taskId = 0; // Cчетчик задач
 
@@ -40,6 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
         return taskId++;
     }
 
+    // Метод возвращает List - список истории просмотра, прлученный из двусвязного списка
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();

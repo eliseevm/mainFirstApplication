@@ -116,76 +116,76 @@ public class Main {
     }
     public static void startTest() {
         System.out.println("Сейчас создаю задачи");
-        test7();
-        test7();
+        createNewTask();
+        createNewTask();
         System.out.println("Сейчас создаю эпики");
-        test8();
-        test8();
+        createNewEpic();
+        createNewEpic();
         System.out.println("Сейчас создпю подзадачи");
-        test9(3);
-        test9(3);
-        test9(3);
+        createNewSubtaskByEpic(3);
+        createNewSubtaskByEpic(3);
+        createNewSubtaskByEpic(3);
         System.out.println("Смотрю задачи и эпики");
-        test4(0);
-        test4(1);
-        test6(2);
-        test6(3);
+        watchTask(0);
+        watchTask(1);
+        watchEpic(2);
+        watchEpic(3);
         System.out.println("Смотрю историю");
-        test15();
+        watchHistory();
         System.out.println("Смотрю задачи и эпики");
-        test6(2);
-        test6(3);
-        test4(1);
-        test4(0);
+        watchEpic(2);
+        watchEpic(3);
+        watchTask(1);
+        watchTask(0);
         System.out.println("Смотрю историю");
-        test15();
+        watchHistory();
         System.out.println("Смотрю задачи и эпики");
-        test4(1);
-        test6(3);
-        test6(2);
-        test4(0);
+        watchTask(1);
+        watchEpic(3);
+        watchEpic(2);
+        watchTask(0);
         System.out.println("Смотрю историю");
-        test15();
+        watchHistory();
         System.out.println("Удаляю задачи");
-        test13(1);
-        test13(3);
+        deleteTaskById(1);
+        deleteTaskById(3);
         System.out.println("Смотрю историю");
-        test15();
+        watchHistory();
     }
 
-    static void test4(int vybor) {
+    static void watchTask(int vybor) {
         Task temp = manager.outputTaskById(vybor);
         System.out.println("Просмотрена задача № " + vybor);
     }
 
-    static void test6(int vybor) {
+    static void watchEpic(int vybor) {
         Task temp = manager.outputEpicById(vybor);
         System.out.println("Просмотрен эпик № " + vybor);
     }
 
-    static void test7() {
+    static void createNewTask() {
         manager.inputNewTask(name, description, status);
         System.out.println("Создана задача");
     }
 
-    static void test8() {
+    static void createNewEpic() {
         manager.inputNewEpic(name2, description4);
         System.out.println("Создан эпик");
     }
 
-    static void test9(int vybor) {
+    static void createNewSubtaskByEpic(int vybor) {
         manager.inputNewSubTask(name3, description5, status4, vybor);
         System.out.println(manager.getDescriptionEpic());
         Epic epic = manager.getDescriptionEpic().get(vybor);
         System.out.println("Создана подзадача для эпика № " + vybor);
     }
 
-    static void test13(int vybor) {
+    static void deleteTaskById(int vybor) {
         manager.deletTaskById(vybor);
         System.out.println("Удалена задача № " + vybor);
     }
 
-    static void test15() {
+    static void watchHistory() {
         List<Task> histor = manager.getHistory();
         for (Task output : histor) {
             System.out.println(output);
