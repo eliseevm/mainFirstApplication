@@ -4,6 +4,7 @@ import logic.Epic;
 import logic.SubTask;
 import logic.Task;
 
+import java.io.IOException;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -14,7 +15,6 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
     private InMemoryHistoryManager historyManager = new InMemoryHistoryManager(); // Создаем новый
     // объект класса
-
     private int taskId = 0; // Cчетчик задач
 
     // Метод возвращает перечень задач
@@ -29,10 +29,15 @@ public class InMemoryTaskManager implements TaskManager {
         return descriptionSubTasks;
     }
 
-    // Перечень возвращает перечень эпиков
+    // Метод возвращает перечень эпиков
     @Override
     public HashMap<Integer, Epic> getDescriptionEpic() {
         return descriptionEpic;
+    }
+
+    //  Метод возвращает объект с историей просмотра задач
+    public InMemoryHistoryManager getHistoryManager() {
+        return historyManager;
     }
 
     // Метод получения номера для задачи
@@ -43,8 +48,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод возвращает List - список истории просмотра, прлученный из двусвязного списка
     @Override
-    public List<Task> getHistory() {
+    public List<Task> getHistory() throws IOException {
         return historyManager.getHistory();
+    }
+
+    // Метод сохраняет новый id (восстанавливает максимальный id из файла)
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
     }
 
     // Метод возвращает все задачи
@@ -68,7 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод возвращает задачи по ID
     @Override
-    public Task outputTaskById(int numberTask) {
+    public Task outputTaskById(int numberTask) throws IOException {
         historyManager.add(descriptionTasks.get(numberTask));
         return descriptionTasks.get(numberTask);
     }
@@ -89,7 +99,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод ввода новой задачи
     @Override
-    public void inputNewTask(String name, String description, Status status) {
+    public void inputNewTask(String name, String description, Status status) throws IOException {
         int id = getTaskId();
         Task tasc = new Task(name, description, status, id);
         descriptionTasks.put(id, tasc);
@@ -97,7 +107,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод ввода нового эпика
     @Override
-    public void inputNewEpic(String name, String description) {
+    public void inputNewEpic(String name, String description) throws IOException {
         int id = getTaskId();
         Epic epic = new Epic(name, description, id);
         descriptionEpic.put(id, epic);
@@ -105,7 +115,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод ввода новой подзадачи
     @Override
-    public void inputNewSubTask(String name, String description, Status status, int epicId) {
+    public void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException {
         int id = getTaskId();
         Epic epic = descriptionEpic.get(epicId);
         SubTask subTask = new SubTask(name, description, status, id, epicId);
@@ -165,9 +175,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-    // Метод удаления всех задач
+    // Метод удаления задач всех типов
     @Override
     public void deletAllTasks() {
         descriptionEpic.clear();
+        descriptionTasks.clear();
+        descriptionSubTasks.clear();
     }
 }

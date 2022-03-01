@@ -1,6 +1,6 @@
-package logic;
-
-import manager.InMemoryTaskManager;
+import logic.Epic;
+import logic.SubTask;
+import logic.Task;
 import manager.FileBackedTasksManager;
 import manager.Status;
 
@@ -8,10 +8,12 @@ import java.io.*;
 import java.util.List;
 import java.util.Scanner;
 
+public class Mains {
 
-public class Main {
 
-    static InMemoryTaskManager manager = new InMemoryTaskManager();
+    static FileBackedTasksManager manager2
+            = new FileBackedTasksManager(new File("src/history.csv"));
+
 
     static int command;
     static int vybor;
@@ -30,8 +32,7 @@ public class Main {
     static Status status4 = Status.DONE;
 
     public static void main(String[] args) throws IOException {
-
-
+        manager2.fromString();
         while (true) {
             System.out.println("Привет! ручное тестирование - 1; автоматическое - 2; Выход - 0");
             Scanner scanner = new Scanner(System.in);
@@ -45,76 +46,78 @@ public class Main {
                     printMenu();
                     command = scanner.nextInt();
                     if (command == 1) {
-                        System.out.println("Это все задачи : " + manager.outputAllTask());
+                        System.out.println("Это все задачи : " + manager2.outputAllTask());
                     } else if (command == 2) {
-                        System.out.println("Это все эпики : " + manager.outputAllEpics());
+                        System.out.println("Это все эпики : " + manager2.outputAllEpics());
                     } else if (command == 3) {
                         System.out.println("Введите № эпика");
                         vybor = scanner.nextInt();
-                        System.out.println("Это все подзадачи по эпику : " + manager
+                        System.out.println("Это все подзадачи по эпику : " + manager2
                                 .outputSubtaskByEpik(vybor));
                     } else if (command == 4) {
                         System.out.println("Введите №");
                         vybor = scanner.nextInt();
-                        Task temp = manager.outputTaskById(vybor);
+                        Task temp = manager2.outputTaskById(vybor);
                         System.out.println(temp);
                     } else if (command == 5) {
                         System.out.println("Введите №");
                         vybor = scanner.nextInt();
-                        Task temp = manager.outputSubTaskById(vybor);
+                        Task temp = manager2.outputSubTaskById(vybor);
                         System.out.println(temp);
                     } else if (command == 6) {
                         System.out.println("Введите №");
                         vybor = scanner.nextInt();
-                        Task temp = manager.outputEpicById(vybor);
+                        Task temp = manager2.outputEpicById(vybor);
                         System.out.println(temp);
                     } else if (command == 7) {
-                        manager.inputNewTask(name, description, status);
-                        System.out.println(manager.getDescriptionTasks());
+                        manager2.inputNewTask(name, description, status);
+                        System.out.println(manager2.getDescriptionTasks());
                     } else if (command == 8) {
-                        manager.inputNewEpic(name2, description4);
-                        System.out.println(manager.getDescriptionEpic());
+                        manager2.inputNewEpic(name2, description4);
+                        System.out.println(manager2.getDescriptionEpic());
                     } else if (command == 9) {
                         System.out.println("Введите № Эпика ");
                         vybor = scanner.nextInt();
-                        manager.inputNewSubTask(name3, description5, status4, vybor);
-                        System.out.println(manager.getDescriptionEpic());
-                        Epic epic = manager.getDescriptionEpic().get(vybor);
+                        manager2.inputNewSubTask(name3, description5, status4, vybor);
+                        System.out.println(manager2.getDescriptionEpic());
+                        Epic epic = manager2.getDescriptionEpic().get(vybor);
                         System.out.println(epic.getListSubTask());
                     } else if (command == 10) {
                         Task task = new Task(nameO, descriptionO, status0, idO);
-                        manager.updateTask(task);
-                        System.out.println(manager.getDescriptionTasks());
+                        manager2.updateTask(task);
+                        System.out.println(manager2.getDescriptionTasks());
                     } else if (command == 11) {
                         Epic epic = new Epic(nameO, descriptionO, idO);
-                        manager.updateEpic(epic);
-                        System.out.println(manager.getDescriptionEpic());
+                        manager2.updateEpic(epic);
+                        System.out.println(manager2.getDescriptionEpic());
                     } else if (command == 12) {
                         System.out.println("начало 12");
                         SubTask subTask = new SubTask(nameO, descriptionO, status0, idO, epicIdiO);
-                        manager.updateSubTask(subTask);
-                        Epic epic = manager.getDescriptionEpic().get(epicIdiO);
-                        System.out.println(manager.getDescriptionSubTasks());
+                        manager2.updateSubTask(subTask);
+                        Epic epic = manager2.getDescriptionEpic().get(epicIdiO);
+                        System.out.println(manager2.getDescriptionSubTasks());
                         System.out.println("конец 12");
                     } else if (command == 13) {
                         System.out.println("Введите № задачи ");
                         vybor = scanner.nextInt();
-                        manager.deletTaskById(vybor);
-                        System.out.println(manager.getDescriptionTasks());
+                        manager2.deletTaskById(vybor);
+                        System.out.println(manager2.getDescriptionTasks());
                     } else if (command == 14) {
-                        manager.deletAllTasks();
+                        manager2.deletAllTasks();
                     } else if (command == 15) {
-                        List<Task> histor = manager.getHistory();
-                        for (Task output : histor) {
+                        List<Task> histor2 = manager2.getHistory();
+                        for (Task output : histor2) {
                             System.out.println(output);
                         }
-                        } else if (command == 0) {
+                    } else if (command == 0) {
+
                         break;
                     }
                 }
             }
         }
     }
+
     public static void startTest() throws IOException {
         System.out.println("Сейчас создаю задачи");
         createNewTask();
@@ -155,39 +158,39 @@ public class Main {
     }
 
     static void watchTask(int vybor) throws IOException {
-        Task temp = manager.outputTaskById(vybor);
+        Task temp = manager2.outputTaskById(vybor);
         System.out.println("Просмотрена задача № " + vybor);
     }
 
     static void watchEpic(int vybor) {
-        Task temp = manager.outputEpicById(vybor);
+        Task temp = manager2.outputEpicById(vybor);
         System.out.println("Просмотрен эпик № " + vybor);
     }
 
     static void createNewTask() throws IOException {
-        manager.inputNewTask(name, description, status);
+        manager2.inputNewTask(name, description, status);
         System.out.println("Создана задача");
     }
 
     static void createNewEpic() throws IOException {
-        manager.inputNewEpic(name2, description4);
+        manager2.inputNewEpic(name2, description4);
         System.out.println("Создан эпик");
     }
 
     static void createNewSubtaskByEpic(int vybor) throws IOException {
-        manager.inputNewSubTask(name3, description5, status4, vybor);
-        System.out.println(manager.getDescriptionEpic());
-        Epic epic = manager.getDescriptionEpic().get(vybor);
+        manager2.inputNewSubTask(name3, description5, status4, vybor);
+        System.out.println(manager2.getDescriptionEpic());
+        Epic epic = manager2.getDescriptionEpic().get(vybor);
         System.out.println("Создана подзадача для эпика № " + vybor);
     }
 
     static void deleteTaskById(int vybor) {
-        manager.deletTaskById(vybor);
+        manager2.deletTaskById(vybor);
         System.out.println("Удалена задача № " + vybor);
     }
 
     static void watchHistory() throws IOException {
-        List<Task> histor = manager.getHistory();
+        List<Task> histor = manager2.getHistory();
         for (Task output : histor) {
             System.out.println(output);
         }

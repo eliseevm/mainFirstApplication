@@ -4,6 +4,7 @@ import logic.Epic;
 import logic.SubTask;
 import logic.Task;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,8 @@ public interface TaskManager {
     // Метод получает номер ID для задачи
     int getTaskId();
 
-    List<Task> getHistory();
+    // Метод возвращает историю просмотров
+    List<Task> getHistory() throws IOException;
 
     // Метод возвращает все задачи
     HashMap<Integer, Task> outputAllTask();
@@ -34,7 +36,7 @@ public interface TaskManager {
     ArrayList<SubTask> outputSubtaskByEpik(int epicId);
 
     // Метод возвращает задачи по ID
-    Task outputTaskById(int numberTask);
+    Task outputTaskById(int numberTask) throws IOException;
 
     // Метод возвращает подзадачи по ID
     SubTask outputSubTaskById(int numberTask);
@@ -43,13 +45,12 @@ public interface TaskManager {
     Epic outputEpicById(int numberTask);
 
     // Метод ввода новой задачи
-    void inputNewTask(String name, String description, Status status);
-
+    void inputNewTask(String name, String description, Status status) throws IOException;
     // Метод ввода нового эпика
-    void inputNewEpic(String name, String description);
+    void inputNewEpic(String name, String description) throws IOException;
 
     // Метод ввода новой подзадачи
-    void inputNewSubTask(String name, String description, Status status, int epicId);
+    void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException;
 
     // Метод для обновления задач по номеру.
     void updateTask(Task task);
@@ -60,8 +61,10 @@ public interface TaskManager {
     // Метод для обновления эпика по номеру.
     void updateEpic(Epic epic);
 
+    // Метод удаляет задачу по номеру
     void deletTaskById(int numberTask);
 
     // Метод удаления всех зад
     void deletAllTasks();
+
 }

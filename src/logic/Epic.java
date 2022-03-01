@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
-
+    Status status;
     private ArrayList<SubTask> listSubTask;
 
     public Epic(String name, String description, int id) {
@@ -39,9 +39,10 @@ public class Epic extends Task {
                 '}';
     }
 
+    // Метод актуализации статуса эпика в зависимости от состояния статуса подзадач
     @Override
     public Status getStatus() {
-        Status status = Status.NEW;
+        status = Status.NEW;
         if (!(listSubTask.isEmpty())) {
             int j = 0;
             int s = 0;
