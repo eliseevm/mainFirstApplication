@@ -39,10 +39,10 @@ public interface TaskManager {
     Task outputTaskById(int numberTask) throws IOException;
 
     // Метод возвращает подзадачи по ID
-    SubTask outputSubTaskById(int numberTask);
+    SubTask outputSubTaskById(int numberTask) throws IOException;
 
     // Метод возвращает эпик по ID
-    Epic outputEpicById(int numberTask);
+    Epic outputEpicById(int numberTask) throws IOException;
 
     // Метод ввода новой задачи
     void inputNewTask(String name, String description, Status status) throws IOException;
@@ -62,9 +62,9 @@ public interface TaskManager {
     void updateEpic(Epic epic);
 
     // Метод удаляет задачу по номеру
-    void deletTaskById(int numberTask);
+    void deletTaskById(int numberTask) throws IOException;
 
     // Метод удаления всех зад
-    void deletAllTasks();
+    void deletAllTasks() throws IOException;
 
 }

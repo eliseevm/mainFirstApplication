@@ -85,14 +85,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод возвращает подзадачи по ID
     @Override
-    public SubTask outputSubTaskById(int numberTask) {
+    public SubTask outputSubTaskById(int numberTask) throws IOException {
         historyManager.add(descriptionSubTasks.get(numberTask));
         return descriptionSubTasks.get(numberTask);
     }
 
     // Метод возвращает эпик по ID
     @Override
-    public Epic outputEpicById(int numberTask) {
+    public Epic outputEpicById(int numberTask) throws IOException {
         historyManager.add(descriptionEpic.get(numberTask));
         return descriptionEpic.get(numberTask);
     }
@@ -157,7 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод удаления задачи по номеру
     @Override
-    public void deletTaskById(int numberTask) {
+    public void deletTaskById(int numberTask) throws IOException {
         HashMap<Integer, InMemoryHistoryManager.Node<Task>> tMap = historyManager.getTempNodeMap();
         if (tMap.containsKey(numberTask)) {
             if (descriptionTasks.containsKey(numberTask)) {
@@ -177,7 +177,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод удаления задач всех типов
     @Override
-    public void deletAllTasks() {
+    public void deletAllTasks() throws IOException {
         descriptionEpic.clear();
         descriptionTasks.clear();
         descriptionSubTasks.clear();

@@ -76,9 +76,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         BufferedReader br = new BufferedReader(r); // Создаем буфер для строки
         while (br.ready()) { // Запускаем цикл для построчного извлечения из буфера
             String line = br.readLine(); // Извлекаем построчно
-            String[] split2 = line.split(";"); // Делим строку и раскладываем части строки по ячейкам массива по разделителю ;
+            String[] split2 = line.split(";"); // Делим строку и раскладываем части строки
+            // по ячейкам массива с разделителем ;
             for (String str : split2) { // Запускаем цикл для получения отдельных подстрок
-                String[] split1 = str.split(","); // Создаем массив для разбивки строки на части для рпспределения по переменным
+                String[] split1 = str.split(","); // Создаем массив для разбивки строки на
+                // части для рпспределения по переменным
                 if (split1[0].equals("TASK")) {
                     taskFromString(split1);
                 } else if (split1[0].equals("EPIC")) {
@@ -93,12 +95,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             }
         }
         br.close(); // Закрываем буфер обмена
-        getMaxId(); // Вызываем метод осстанавления счетчика задач
+        getMaxId(); // Вызываем метод восстанавления счетчика задач
     }
 
-    // Метод осстанавления счетчика задач
+    // Метод восстанавления счетчика задач
     public void getMaxId() {
-        int maxId = -1;
+        int maxId = 0;
         for (Integer key : tempDescriptionEpic.keySet()) {
             int epicId = tempDescriptionEpic.get(key).getId();
             if (epicId > maxId) {
@@ -141,7 +143,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         SubTask restoredSubTask = new SubTask(name, deskription, status, id, epicId);
         tempDescriptionSubTasks.put(id, restoredSubTask);
         List<SubTask> listByEpic = tempEpic.getListSubTask();
-        //if (epicId != null) {
         listByEpic.add(restoredSubTask);
     }
 
@@ -181,6 +182,88 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             }
         }
     }
+
+    // Метод возвращает задачи по ID
+    @Override
+    public Task outputTaskById(int numberTask) throws IOException {
+        getHistoryManager().add(getDescriptionTasks().get(numberTask));
+        save();
+        return getDescriptionTasks().get(numberTask);
+    }
+
+    // Метод возвращает подзадачи по ID
+    @Override
+    public SubTask outputSubTaskById(int numberTask) throws IOException {
+        getHistoryManager().add(getDescriptionSubTasks().get(numberTask));
+        save();
+        return getDescriptionSubTasks().get(numberTask);
+    }
+
+    // Метод возвращает эпик по ID
+    @Override
+    public Epic outputEpicById(int numberTask) throws IOException {
+        getHistoryManager().add(getDescriptionEpic().get(numberTask));
+        save();
+        return getDescriptionEpic().get(numberTask);
+    }
+
+    // Метод ввода новой задачи
+    @Override
+    public void inputNewTask(String name, String description, Status status) throws IOException {
+        int id = getTaskId();
+        Task tasc = new Task(name, description, status, id);
+        getDescriptionTasks().put(id, tasc);
+        save();
+    }
+
+    // Метод ввода нового эпика
+    @Override
+    public void inputNewEpic(String name, String description) throws IOException {
+        int id = getTaskId();
+        Epic epic = new Epic(name, description, id);
+        getDescriptionEpic().put(id, epic);
+        save();
+    }
+
+    // Метод ввода новой подзадачи
+    @Override
+    public void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException {
+        int id = getTaskId();
+        Epic epic = getDescriptionEpic().get(epicId);
+        SubTask subTask = new SubTask(name, description, status, id, epicId);
+        epic.getListSubTask().add(subTask);
+        getDescriptionSubTasks().put(id, subTask);
+        save();
+    }
+    // Метод удаления задачи по номеру
+    @Override
+    public void deletTaskById(int numberTask) throws IOException {
+        HashMap<Integer, InMemoryHistoryManager.Node<Task>> tMap = getHistoryManager().getTempNodeMap();
+        if (tMap.containsKey(numberTask)) {
+            if (getDescriptionTasks().containsKey(numberTask)) {
+                InMemoryHistoryManager.Node<Task> tempNode = tMap.get(numberTask);
+                tMap.remove(numberTask);
+                getHistoryManager().removeNode(tempNode);
+                getDescriptionTasks().remove(numberTask);
+            } else if (getDescriptionEpic().containsKey(numberTask)) {
+                InMemoryHistoryManager.Node<Task> tempNode = tMap.get(numberTask);
+                tMap.remove(numberTask);
+                getHistoryManager().removeNode(tempNode);
+                getDescriptionEpic().remove(numberTask);
+            }
+        }
+        save();
+    }
+
+
+    // Метод удаления задач всех типов
+    @Override
+    public void deletAllTasks() throws IOException {
+        getDescriptionEpic().clear();
+        getDescriptionTasks().clear();
+        getDescriptionSubTasks().clear();
+        save();
+    }+++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
 

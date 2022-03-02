@@ -162,7 +162,7 @@ public class Mains {
         System.out.println("Просмотрена задача № " + vybor);
     }
 
-    static void watchEpic(int vybor) {
+    static void watchEpic(int vybor) throws IOException {
         Task temp = manager2.outputEpicById(vybor);
         System.out.println("Просмотрен эпик № " + vybor);
     }
@@ -184,7 +184,7 @@ public class Mains {
         System.out.println("Создана подзадача для эпика № " + vybor);
     }
 
-    static void deleteTaskById(int vybor) {
+    static void deleteTaskById(int vybor) throws IOException {
         manager2.deletTaskById(vybor);
         System.out.println("Удалена задача № " + vybor);
     }
