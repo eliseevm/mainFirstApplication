@@ -1,7 +1,6 @@
 package logic;
 
 import manager.InMemoryTaskManager;
-import manager.FileBackedTasksManager;
 import manager.Status;
 
 import java.io.*;
@@ -213,7 +212,5 @@ public class Main {
         System.out.println("0 - Завершить работу приложения.");
     }
 }
-
-
 
 

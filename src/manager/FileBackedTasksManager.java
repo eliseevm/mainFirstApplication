@@ -11,53 +11,98 @@ import java.util.List;
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private File fileName;
 
-    HashMap<Integer, Task> tempDescriptionTask = getDescriptionTasks();
-    HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
-    HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
-    List<Task> historyList;
-
     public FileBackedTasksManager(File fileNames) {
 
         fileName = fileNames;
     }
 
-    // Метод сохранения параметров менеджера перед заверщением работы программы
-    public void save() throws IOException {
+    static FileBackedTasksManager loadFromFile(File file) throws IOException {
+        FileBackedTasksManager manager =
+                new FileBackedTasksManager(new File(String.valueOf(file)));
+        manager.fromString();
+        return manager;
+    }
+
+
+    public  static void main(String[] args) throws IOException {
+        FileBackedTasksManager manager3 =
+                new FileBackedTasksManager(new File("src/history.csv"));
+        manager3.inputNewTask("name", "description", Status.NEW);
+        manager3.inputNewEpic("name", "description");
+        manager3.inputNewEpic("name", "description");
+        manager3.inputNewSubTask("name", "description", Status.NEW, 1);
+        manager3.inputNewSubTask("name", "description", Status.NEW, 2);
+        manager3.inputNewTask("name", "description", Status.NEW);
+        manager3.outputTaskById(0);
+        manager3.outputTaskById(5);
+        manager3.outputEpicById(1);
+        manager3.outputEpicById(2);
+        manager3.outputSubTaskById(3);
+        manager3.outputSubTaskById(4);
+        FileBackedTasksManager manager4 = loadFromFile(new File("src/history.csv"));
+        boolean n = (manager3.getHistory().equals(manager4.getHistory()));
+        boolean m = (manager3.getDescriptionEpic().equals(manager4.getDescriptionEpic()));
+        boolean s = (manager3.getDescriptionTasks().equals(manager4.getDescriptionTasks()));
+        boolean d = (manager3.getDescriptionSubTasks().equals(manager4.getDescriptionSubTasks()));
+            System.out.println("Если восстановление верно выводим TRUE если нет FALSE");
+        System.out.println("История - " + n);
+        System.out.println("Эпики - " + m);
+        System.out.println("Задачи - " + s);
+        System.out.println("Подзадачи - " + d);
+
+        }
+
+        private HashMap<Integer, Task> tempDescriptionTask = getDescriptionTasks();
+        private HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
+        private HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
+        private List<Task> historyList;
+
+
+    // Метод сохранения параметров менеджера перед завершением работы программы
+    public void save() {
         historyList = getHistoryManager().getHistory(); // Получаем историю просмотров
-        FileWriter writer = new FileWriter(fileName); // Открылаем поток для записи в файл
+        try {
+            FileWriter writer = new FileWriter(fileName); // Открываем поток для записи в файл
+        if (fileName == null) {
+                throw new ManagerSaveException("Файл отсутствует");
+            }
+            for (Integer keyTask : tempDescriptionTask.keySet()) {
+                String strTask = toString(tempDescriptionTask.get(keyTask)); // Преобр. Таску в строку
+                String typ = TaskEnum.TASK.toString(); // Преобразуем Енум типа Таски в строку
+                String str = String.join(",", typ, strTask, ";"); // Собираем строку
+                // и добавляем в нее поле "тип". Сборка строки через символ ;
+                writer.write(str); // Записываем в файл
+            }
+            for (Integer keyEpic : tempDescriptionEpic.keySet()) {
+                String strEpic = toString(tempDescriptionEpic.get(keyEpic)); // Преобр. Таску в строку
+                String typ = TaskEnum.EPIC.toString(); // Преобразуем Енум типа Таски в строку
+                String str = String.join(",", typ, strEpic, ";"); // Собираем строку
+                // и добавляем в нее поле "тип". Сборка строки через символ ;
+                writer.write(str); // Записываем в файл
+            }
+            for (Integer keySubTask : tempDescriptionSubTasks.keySet()) {
+                String strSubTask = toString(tempDescriptionSubTasks.get(keySubTask));
+                String typ = TaskEnum.SUBTASK.toString();
+                String epicId = String.valueOf(tempDescriptionSubTasks.get(keySubTask).getEpicId());
+                String str = String.join(",", typ, strSubTask, epicId, ";");
+                writer.write(str);
+            }
+            writer.write("" + ";"); // Добавляем в файл пустую строку
 
-        for (Integer keyTask : tempDescriptionTask.keySet()) {
-            String strTask = toString(tempDescriptionTask.get(keyTask)); // Преобр. Таску в строку
-            String typ = TaskEnum.TASK.toString(); // Преобразуем Енум типа Таски в строку
-            String str = String.join(",", typ, strTask, ";"); // Собираем строку
-            // и обавляем в нее поле "тип". Сборка строки через символ ;
-            writer.write(str); // Записываем в файл
+            String[] historyId = new String[historyList.size()]; // Объявляем массив для записи истории
+            for (int i = 0; i < historyList.size(); i++) {
+                String id = String.valueOf(historyList.get(i).getId()); // Собираем номера задач для
+                // записи в файл
+                historyId[i] = id;
+            }
+            String historyToFile = String.join(",", historyId); // Формируем строку для записи
+            writer.write(historyToFile);
+            writer.close(); // Закрываем поток
+        } catch (ManagerSaveException exception) {
+            System.out.println(exception.getMessage());
+        } catch (IOException | NullPointerException exception) {
+            System.out.println("Нет файла для восстановления менеджера");
         }
-        for (Integer keyEpic : tempDescriptionEpic.keySet()) {
-            String strEpic = toString(tempDescriptionEpic.get(keyEpic)); // Преобр. Таску в строку
-            String typ = TaskEnum.EPIC.toString(); // Преобразуем Енум типа Таски в строку
-            String str = String.join(",", typ, strEpic, ";"); // Собираем строку
-            // и обавляем в нее поле "тип". Сборка строки через символ ;
-            writer.write(str); // Записываем в файл
-        }
-        for (Integer keySubTask : tempDescriptionSubTasks.keySet()) {
-            String strSubTask = toString(tempDescriptionSubTasks.get(keySubTask));
-            String typ = TaskEnum.SUBTASK.toString();
-            String epicId = String.valueOf(tempDescriptionSubTasks.get(keySubTask).getEpicId());
-            String str = String.join(",", typ, strSubTask, epicId, ";");
-            writer.write(str);
-        }
-        writer.write("" + ";"); // Добавляем в файл пустую строку
-
-        String[] historyId = new String[historyList.size()]; // Объявляем массив для записи истории
-        for (int i = 0; i < historyList.size(); i++) {
-            String id = String.valueOf(historyList.get(i).getId()); // Собираем номера задач для
-            // записи в файл
-            historyId[i] = id;
-        }
-        String historyToFile = String.join(",", historyId); // Формируем строку для записи
-        writer.write(historyToFile);
-        writer.close(); // Закрываем поток
     }
 
     // Метод преобразования задач в строку
@@ -70,15 +115,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return str;
     }
 
-    // Метод восстоновления менеджера в состояние, которое было перед заверщением работы программы
+    // Метод восстановления менеджера в состояние, которое было перед завершением работы программы
     public void fromString() throws IOException {
         Reader r = new FileReader("src/history.csv"); // Создаем поток для чтения файла
         BufferedReader br = new BufferedReader(r); // Создаем буфер для строки
         while (br.ready()) { // Запускаем цикл для построчного извлечения из буфера
             String line = br.readLine(); // Извлекаем построчно
-            String[] split2 = line.split(";"); // Делим строку и раскладываем части строки
-            // по ячейкам массива с разделителем ;
-            for (String str : split2) { // Запускаем цикл для получения отдельных подстрок
+                String[] split2 = line.split(";"); // Делим строку и раскладываем части строки
+            try {
+                if (split2.length > 8) { // по ячейкам массива с разделителем ;
+                    throw new ManagerSaveException("Превышено количество элементов массива");
+                }
+            } catch (ManagerSaveException exception) {
+                System.out.println(exception.getMessage());
+            }
+                for (String str : split2) { // Запускаем цикл для получения отдельных подстрок
                 String[] split1 = str.split(","); // Создаем массив для разбивки строки на
                 // части для рпспределения по переменным
                 if (split1[0].equals("TASK")) {
@@ -88,17 +139,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 } else if (split1[0].equals("SUBTASK")) {
                     subTaskFromString(split1);
                 } else if (split1[0].equals("")) {
-                    System.out.println("Пробел");
                 } else {
                     historyFromString(split1);
                 }
             }
         }
         br.close(); // Закрываем буфер обмена
-        getMaxId(); // Вызываем метод восстанавления счетчика задач
+        getMaxId(); // Вызываем метод восстановления счетчика задач
     }
 
-    // Метод восстанавления счетчика задач
+    // Метод восстановления счетчика задач
     public void getMaxId() {
         int maxId = 0;
         for (Integer key : tempDescriptionEpic.keySet()) {
@@ -123,7 +173,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // Метод восстановления задач
-    public void taskFromString(String[] split) {
+    private void taskFromString(String[] split) {
         Integer idTask = Integer.parseInt(split[1]);
         String name = split[2];
         Status status = Status.valueOf(split[3]);
@@ -133,7 +183,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // Метод восстановления подзадач
-    public void subTaskFromString(String[] split) {
+    private void subTaskFromString(String[] split) {
         Integer id = Integer.parseInt(split[1]);
         String name = split[2];
         Status status = Status.valueOf(split[3]);
@@ -146,8 +196,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         listByEpic.add(restoredSubTask);
     }
 
-    // Метод восстановления епика
-    public void epicFromString(String[] split) {
+    // Метод восстановления эпика
+    private void epicFromString(String[] split) {
         Integer idEpic = Integer.parseInt(split[1]);
         String name = split[2];
         String deskription = split[4];
@@ -156,7 +206,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // Метод восстановления истории задач
-    public void historyFromString(String[] split) {
+    private void historyFromString(String[] split) {
         for (String tempId : split) {
             int id = Integer.parseInt(tempId);
             for (Integer tempTaskId : tempDescriptionTask.keySet()) {
@@ -263,7 +313,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         getDescriptionTasks().clear();
         getDescriptionSubTasks().clear();
         save();
-    }+++++++++++++++++++++++++++++++++++++++++++++++++++++
+    }
 }
 
 
