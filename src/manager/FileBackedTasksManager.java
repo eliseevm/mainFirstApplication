@@ -67,16 +67,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 throw new ManagerSaveException("Файл отсутствует");
             }
             for (Integer keyTask : tempDescriptionTask.keySet()) {
-                String strTask = toString(tempDescriptionTask.get(keyTask)); // Преобр. Таску в строку
+                String strTask = toString(tempDescriptionTask.get(keyTask)); // Таску в строку
                 String typ = TaskEnum.TASK.toString(); // Преобразуем Енум типа Таски в строку
-                String str = String.join(",", typ, strTask, ";"); // Собираем строку
+                String str = String.join(",", typ, strTask, ";"); // Собор строки
                 // и добавляем в нее поле "тип". Сборка строки через символ ;
                 writer.write(str); // Записываем в файл
             }
             for (Integer keyEpic : tempDescriptionEpic.keySet()) {
-                String strEpic = toString(tempDescriptionEpic.get(keyEpic)); // Преобр. Таску в строку
+                String strEpic = toString(tempDescriptionEpic.get(keyEpic)); //  Таску в строку
                 String typ = TaskEnum.EPIC.toString(); // Преобразуем Енум типа Таски в строку
-                String str = String.join(",", typ, strEpic, ";"); // Собираем строку
+                String str = String.join(",", typ, strEpic, ";"); // Собор строки
                 // и добавляем в нее поле "тип". Сборка строки через символ ;
                 writer.write(str); // Записываем в файл
             }
@@ -89,13 +89,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             }
             writer.write("" + ";"); // Добавляем в файл пустую строку
 
-            String[] historyId = new String[historyList.size()]; // Объявляем массив для записи истории
+            String[] historyId = new String[historyList.size()]; // Объявляем массив записи истории
             for (int i = 0; i < historyList.size(); i++) {
                 String id = String.valueOf(historyList.get(i).getId()); // Собираем номера задач для
                 // записи в файл
                 historyId[i] = id;
             }
-            String historyToFile = String.join(",", historyId); // Формируем строку для записи
+            String historyToFile = String.join(",", historyId); // Формируем строку записи
             writer.write(historyToFile);
             writer.close(); // Закрываем поток
         } catch (ManagerSaveException exception) {
@@ -277,7 +277,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод ввода новой подзадачи
     @Override
-    public void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException {
+    public void inputNewSubTask(String name, String description, Status status
+            , int epicId) throws IOException {
         int id = getTaskId();
         Epic epic = getDescriptionEpic().get(epicId);
         SubTask subTask = new SubTask(name, description, status, id, epicId);
@@ -288,7 +289,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     // Метод удаления задачи по номеру
     @Override
     public void deletTaskById(int numberTask) throws IOException {
-        HashMap<Integer, InMemoryHistoryManager.Node<Task>> tMap = getHistoryManager().getTempNodeMap();
+        HashMap<Integer, InMemoryHistoryManager.Node<Task>> tMap
+                = getHistoryManager().getTempNodeMap();
         if (tMap.containsKey(numberTask)) {
             if (getDescriptionTasks().containsKey(numberTask)) {
                 InMemoryHistoryManager.Node<Task> tempNode = tMap.get(numberTask);
