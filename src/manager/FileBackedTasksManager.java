@@ -16,6 +16,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         fileName = fileNames;
     }
 
+    // Метод возвращает менеджер с восстановленными мз файла параметрами
     static FileBackedTasksManager loadFromFile(File file) throws IOException {
         FileBackedTasksManager manager =
                 new FileBackedTasksManager(new File(String.valueOf(file)));
@@ -23,8 +24,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return manager;
     }
 
-
-    public  static void main(String[] args) throws IOException {
+    // Метод для проверки правильности восстановления менеджера
+    public static void main(String[] args) throws IOException {
         FileBackedTasksManager manager3 =
                 new FileBackedTasksManager(new File("src/history.csv"));
         manager3.inputNewTask("name", "description", Status.NEW);
@@ -44,18 +45,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         boolean m = (manager3.getDescriptionEpic().equals(manager4.getDescriptionEpic()));
         boolean s = (manager3.getDescriptionTasks().equals(manager4.getDescriptionTasks()));
         boolean d = (manager3.getDescriptionSubTasks().equals(manager4.getDescriptionSubTasks()));
-            System.out.println("Если восстановление верно выводим TRUE если нет FALSE");
+        System.out.println("Если восстановление верно выводим TRUE если нет FALSE");
         System.out.println("История - " + n);
         System.out.println("Эпики - " + m);
         System.out.println("Задачи - " + s);
         System.out.println("Подзадачи - " + d);
 
-        }
+    }
 
-        private HashMap<Integer, Task> tempDescriptionTask = getDescriptionTasks();
-        private HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
-        private HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
-        private List<Task> historyList;
+    private HashMap<Integer, Task> tempDescriptionTask = getDescriptionTasks();
+    private HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
+    private HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
+    private List<Task> historyList;
 
 
     // Метод сохранения параметров менеджера перед завершением работы программы
@@ -63,14 +64,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         historyList = getHistoryManager().getHistory(); // Получаем историю просмотров
         try {
             FileWriter writer = new FileWriter(fileName); // Открываем поток для записи в файл
-        if (fileName == null) {
-                throw new ManagerSaveException("Файл отсутствует");
-            }
+
             for (Integer keyTask : tempDescriptionTask.keySet()) {
                 String strTask = toString(tempDescriptionTask.get(keyTask)); // Таску в строку
                 String typ = TaskEnum.TASK.toString(); // Преобразуем Енум типа Таски в строку
-                String str = String.join(",", typ, strTask, ";"); // Собор строки
-                // и добавляем в нее поле "тип". Сборка строки через символ ;
+                String str = String.join(",", typ, strTask, ";"); // Соборка строки
+                // и добавление в нее поля "тип". Сборка строки через символ ;
                 writer.write(str); // Записываем в файл
             }
             for (Integer keyEpic : tempDescriptionEpic.keySet()) {
@@ -98,10 +97,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             String historyToFile = String.join(",", historyId); // Формируем строку записи
             writer.write(historyToFile);
             writer.close(); // Закрываем поток
-        } catch (ManagerSaveException exception) {
-            System.out.println(exception.getMessage());
-        } catch (IOException | NullPointerException exception) {
-            System.out.println("Нет файла для восстановления менеджера");
+
+        } catch (IOException | NullPointerException exception) { // Ловим исключения
+            ManagerSaveException exception1 = new ManagerSaveException("Файл отсутствует");
+            System.out.println(exception1.getMessage()); // Обрабатываем исключения
         }
     }
 
@@ -116,12 +115,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // Метод восстановления менеджера в состояние, которое было перед завершением работы программы
-    public void fromString() throws IOException {
+    private void fromString() throws IOException {
         Reader r = new FileReader("src/history.csv"); // Создаем поток для чтения файла
         BufferedReader br = new BufferedReader(r); // Создаем буфер для строки
         while (br.ready()) { // Запускаем цикл для построчного извлечения из буфера
             String line = br.readLine(); // Извлекаем построчно
-                String[] split2 = line.split(";"); // Делим строку и раскладываем части строки
+            String[] split2 = line.split(";"); // Делим строку и раскладываем части строки
             try {
                 if (split2.length > 8) { // по ячейкам массива с разделителем ;
                     throw new ManagerSaveException("Превышено количество элементов массива");
@@ -129,7 +128,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             } catch (ManagerSaveException exception) {
                 System.out.println(exception.getMessage());
             }
-                for (String str : split2) { // Запускаем цикл для получения отдельных подстрок
+            for (String str : split2) { // Запускаем цикл для получения отдельных подстрок
                 String[] split1 = str.split(","); // Создаем массив для разбивки строки на
                 // части для рпспределения по переменным
                 if (split1[0].equals("TASK")) {
@@ -286,6 +285,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         getDescriptionSubTasks().put(id, subTask);
         save();
     }
+
     // Метод удаления задачи по номеру
     @Override
     public void deletTaskById(int numberTask) throws IOException {

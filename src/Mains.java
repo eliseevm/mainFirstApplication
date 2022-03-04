@@ -32,7 +32,7 @@ public class Mains {
     static Status status4 = Status.DONE;
 
     public static void main(String[] args) throws IOException {
-        manager2.fromString();
+
         while (true) {
             System.out.println("Привет! ручное тестирование - 1; автоматическое - 2; Выход - 0");
             Scanner scanner = new Scanner(System.in);
