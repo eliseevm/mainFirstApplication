@@ -78,28 +78,28 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод возвращает задачи по ID
     @Override
-    public Task outputTaskById(int numberTask) throws IOException {
+    public Task outputTaskById(int numberTask) throws IOException, ManagerSaveException {
         historyManager.add(descriptionTasks.get(numberTask));
         return descriptionTasks.get(numberTask);
     }
 
     // Метод возвращает подзадачи по ID
     @Override
-    public SubTask outputSubTaskById(int numberTask) throws IOException {
+    public SubTask outputSubTaskById(int numberTask) throws IOException, ManagerSaveException {
         historyManager.add(descriptionSubTasks.get(numberTask));
         return descriptionSubTasks.get(numberTask);
     }
 
     // Метод возвращает эпик по ID
     @Override
-    public Epic outputEpicById(int numberTask) throws IOException {
+    public Epic outputEpicById(int numberTask) throws IOException, ManagerSaveException {
         historyManager.add(descriptionEpic.get(numberTask));
         return descriptionEpic.get(numberTask);
     }
 
     // Метод ввода новой задачи
     @Override
-    public void inputNewTask(String name, String description, Status status) throws IOException {
+    public void inputNewTask(String name, String description, Status status) throws IOException, ManagerSaveException {
         int id = getTaskId();
         Task tasc = new Task(name, description, status, id);
         descriptionTasks.put(id, tasc);
@@ -107,7 +107,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод ввода нового эпика
     @Override
-    public void inputNewEpic(String name, String description) throws IOException {
+    public void inputNewEpic(String name, String description) throws IOException, ManagerSaveException {
         int id = getTaskId();
         Epic epic = new Epic(name, description, id);
         descriptionEpic.put(id, epic);
@@ -115,7 +115,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод ввода новой подзадачи
     @Override
-    public void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException {
+    public void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException, ManagerSaveException {
         int id = getTaskId();
         Epic epic = descriptionEpic.get(epicId);
         SubTask subTask = new SubTask(name, description, status, id, epicId);
@@ -157,7 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод удаления задачи по номеру
     @Override
-    public void deletTaskById(int numberTask) throws IOException {
+    public void deletTaskById(int numberTask) throws IOException, ManagerSaveException {
         HashMap<Integer, InMemoryHistoryManager.Node<Task>> tMap = historyManager.getTempNodeMap();
         if (tMap.containsKey(numberTask)) {
             if (descriptionTasks.containsKey(numberTask)) {
@@ -177,7 +177,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод удаления задач всех типов
     @Override
-    public void deletAllTasks() throws IOException {
+    public void deletAllTasks() throws IOException, ManagerSaveException {
         descriptionEpic.clear();
         descriptionTasks.clear();
         descriptionSubTasks.clear();

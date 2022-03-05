@@ -11,9 +11,9 @@ import java.util.List;
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private File fileName;
 
-    public FileBackedTasksManager(File fileNames) {
+    public FileBackedTasksManager(File fileName) {
 
-        fileName = fileNames;
+        this.fileName = fileName;
     }
 
     // Метод возвращает менеджер с восстановленными мз файла параметрами
@@ -25,7 +25,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // Метод для проверки правильности восстановления менеджера
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ManagerSaveException {
         FileBackedTasksManager manager3 =
                 new FileBackedTasksManager(new File("src/history.csv"));
         manager3.inputNewTask("name", "description", Status.NEW);
@@ -53,18 +53,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     }
 
-    private HashMap<Integer, Task> tempDescriptionTask = getDescriptionTasks();
-    private HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
-    private HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
+    private final HashMap<Integer, Task> tempDescriptionTask = getDescriptionTasks();
+    private final HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
+    private final HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
     private List<Task> historyList;
 
 
     // Метод сохранения параметров менеджера перед завершением работы программы
-    public void save() {
+    public void save() throws ManagerSaveException {
         historyList = getHistoryManager().getHistory(); // Получаем историю просмотров
         try {
             FileWriter writer = new FileWriter(fileName); // Открываем поток для записи в файл
-
             for (Integer keyTask : tempDescriptionTask.keySet()) {
                 String strTask = toString(tempDescriptionTask.get(keyTask)); // Таску в строку
                 String typ = TaskEnum.TASK.toString(); // Преобразуем Енум типа Таски в строку
@@ -97,10 +96,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             String historyToFile = String.join(",", historyId); // Формируем строку записи
             writer.write(historyToFile);
             writer.close(); // Закрываем поток
-
-        } catch (IOException | NullPointerException exception) { // Ловим исключения
-            ManagerSaveException exception1 = new ManagerSaveException("Файл отсутствует");
-            System.out.println(exception1.getMessage()); // Обрабатываем исключения
+        } catch (IOException exception) { // Ловим исключение
+            throw new ManagerSaveException("Сообщение об исключении");
         }
     }
 
@@ -234,7 +231,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод возвращает задачи по ID
     @Override
-    public Task outputTaskById(int numberTask) throws IOException {
+    public Task outputTaskById(int numberTask) throws ManagerSaveException {
         getHistoryManager().add(getDescriptionTasks().get(numberTask));
         save();
         return getDescriptionTasks().get(numberTask);
@@ -242,7 +239,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод возвращает подзадачи по ID
     @Override
-    public SubTask outputSubTaskById(int numberTask) throws IOException {
+    public SubTask outputSubTaskById(int numberTask) throws ManagerSaveException {
         getHistoryManager().add(getDescriptionSubTasks().get(numberTask));
         save();
         return getDescriptionSubTasks().get(numberTask);
@@ -250,7 +247,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод возвращает эпик по ID
     @Override
-    public Epic outputEpicById(int numberTask) throws IOException {
+    public Epic outputEpicById(int numberTask) throws ManagerSaveException {
         getHistoryManager().add(getDescriptionEpic().get(numberTask));
         save();
         return getDescriptionEpic().get(numberTask);
@@ -258,7 +255,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод ввода новой задачи
     @Override
-    public void inputNewTask(String name, String description, Status status) throws IOException {
+    public void inputNewTask(String name, String description, Status status)
+            throws ManagerSaveException {
         int id = getTaskId();
         Task tasc = new Task(name, description, status, id);
         getDescriptionTasks().put(id, tasc);
@@ -267,7 +265,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод ввода нового эпика
     @Override
-    public void inputNewEpic(String name, String description) throws IOException {
+    public void inputNewEpic(String name, String description) throws ManagerSaveException {
         int id = getTaskId();
         Epic epic = new Epic(name, description, id);
         getDescriptionEpic().put(id, epic);
@@ -277,7 +275,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     // Метод ввода новой подзадачи
     @Override
     public void inputNewSubTask(String name, String description, Status status
-            , int epicId) throws IOException {
+            , int epicId) throws ManagerSaveException {
         int id = getTaskId();
         Epic epic = getDescriptionEpic().get(epicId);
         SubTask subTask = new SubTask(name, description, status, id, epicId);
@@ -288,7 +286,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод удаления задачи по номеру
     @Override
-    public void deletTaskById(int numberTask) throws IOException {
+    public void deletTaskById(int numberTask) throws ManagerSaveException {
         HashMap<Integer, InMemoryHistoryManager.Node<Task>> tMap
                 = getHistoryManager().getTempNodeMap();
         if (tMap.containsKey(numberTask)) {
@@ -310,7 +308,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод удаления задач всех типов
     @Override
-    public void deletAllTasks() throws IOException {
+    public void deletAllTasks() throws ManagerSaveException {
         getDescriptionEpic().clear();
         getDescriptionTasks().clear();
         getDescriptionSubTasks().clear();

@@ -36,21 +36,21 @@ public interface TaskManager {
     ArrayList<SubTask> outputSubtaskByEpik(int epicId);
 
     // Метод возвращает задачи по ID
-    Task outputTaskById(int numberTask) throws IOException;
+    Task outputTaskById(int numberTask) throws IOException, ManagerSaveException;
 
     // Метод возвращает подзадачи по ID
-    SubTask outputSubTaskById(int numberTask) throws IOException;
+    SubTask outputSubTaskById(int numberTask) throws IOException, ManagerSaveException;
 
     // Метод возвращает эпик по ID
-    Epic outputEpicById(int numberTask) throws IOException;
+    Epic outputEpicById(int numberTask) throws IOException, ManagerSaveException;
 
     // Метод ввода новой задачи
-    void inputNewTask(String name, String description, Status status) throws IOException;
+    void inputNewTask(String name, String description, Status status) throws IOException, ManagerSaveException;
     // Метод ввода нового эпика
-    void inputNewEpic(String name, String description) throws IOException;
+    void inputNewEpic(String name, String description) throws IOException, ManagerSaveException;
 
     // Метод ввода новой подзадачи
-    void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException;
+    void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException, ManagerSaveException;
 
     // Метод для обновления задач по номеру.
     void updateTask(Task task);
@@ -62,9 +62,9 @@ public interface TaskManager {
     void updateEpic(Epic epic);
 
     // Метод удаляет задачу по номеру
-    void deletTaskById(int numberTask) throws IOException;
+    void deletTaskById(int numberTask) throws IOException, ManagerSaveException;
 
     // Метод удаления всех зад
-    void deletAllTasks() throws IOException;
+    void deletAllTasks() throws IOException, ManagerSaveException;
 
 }
