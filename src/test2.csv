@@ -1,0 +1,7 @@
+type,name,description,status,id,duration,startTime,biEpic
+TASK,name,описание,NEW,0,PT10M,2022-04-03T08:22:25
+TASK,name,описание,DONE,3,PT10M,2022-04-03T08:22:25
+EPIC,name,описание,NEW,1,PT0S,2022-04-04T08:22:25
+EPIC,name,описание,NEW,2,PT0S,2022-04-04T08:22:25
+
+0,3,1,2

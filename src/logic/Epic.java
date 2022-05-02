@@ -2,42 +2,27 @@ package logic;
 
 import manager.Status;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
-    Status status;
-    private ArrayList<SubTask> listSubTask;
 
-    public Epic(String name, String description, int id) {
-        super(name, description, id);
+    private ArrayList<SubTask> listSubTask;
+    Status status;
+    Duration duration = Duration.ofMinutes(0);
+
+    public Epic(String name, String description, int id, LocalDateTime startTime) {
+        super(name, description, id, startTime);
         listSubTask = new ArrayList<>();
+
     }
 
     public ArrayList<SubTask> getListSubTask() {
         return listSubTask;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Epic epic = (Epic) o;
-        return listSubTask.equals(epic.listSubTask);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), listSubTask);
-    }
-
-    @Override
-    public String toString() {
-        return "Epic{" +
-                "listSubTask=" + listSubTask +
-                '}';
-    }
 
     // Метод актуализации статуса эпика в зависимости от состояния статуса подзадач
     @Override
@@ -65,6 +50,41 @@ public class Epic extends Task {
             status = Status.NEW;
         }
         return status;
+    }
+
+    // Метод устанавливает продолжительность эпика в зависимости от saubtask, возвращает новую
+    // продолжительность эпика
+    @Override
+    public Duration getDuration() {
+        duration = Duration.ofMinutes(0);
+        ArrayList<SubTask> temp = getListSubTask();
+        for (SubTask subTask : temp) {
+            Duration durationST = subTask.getDuration();
+            duration = duration.plus(durationST);
+        }
+        return duration;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Epic epic = (Epic) o;
+        return listSubTask.equals(epic.listSubTask)
+                && status == epic.status && duration.equals(epic.duration);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), listSubTask, status, duration);
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "listSubTask=" + listSubTask +
+                '}';
     }
 }
 

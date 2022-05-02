@@ -2,14 +2,17 @@ package logic;
 
 import manager.Status;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class SubTask extends Task {
 
     private  int epicId;
 
-    public SubTask(String name, String description, Status status, int id, int epicId) {
-        super(name, description, status, id);
+    public SubTask(String name, String description, Status status, int id, int epicId, Duration duration
+            , LocalDateTime startTime) {
+        super(name, description, status, id, duration, startTime);
         this.epicId = epicId;
     }
 
@@ -17,7 +20,6 @@ public class SubTask extends Task {
    public int getEpicId() {
        return epicId;
    }
-
 
     @Override
     public boolean equals(Object o) {

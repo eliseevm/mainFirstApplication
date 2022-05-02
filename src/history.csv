@@ -1,0 +1,9 @@
+type,name,description,status,id,duration,startTime,biEpic
+TASK,name,description,NEW,0,PT10M,2022-04-03T08:22:25
+TASK,name,description,NEW,5,PT10M,2022-04-04T08:22:25
+TASK,name,description,NEW,6,PT10M,2022-03-28T08:22:25
+EPIC,name,description,DONE,1,PT6H,2021-04-04T07:22:25
+EPIC,name,description,NEW,2,PT0S,2021-04-04T08:22:25
+SUBTASK,name,description,DONE,3,PT3H,2020-04-05T08:22:25,1
+SUBTASK,name,description,DONE,4,PT3H,2020-05-05T08:22:25,1
+

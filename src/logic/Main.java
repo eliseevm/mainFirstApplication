@@ -1,9 +1,12 @@
-/*package logic;
+package logic;
 
 import manager.InMemoryTaskManager;
+import manager.ManagerSaveException;
 import manager.Status;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,7 +31,7 @@ public class Main {
     static Status status0 = Status.DONE;
     static Status status4 = Status.DONE;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ManagerSaveException {
 
 
         while (true) {
@@ -68,29 +71,53 @@ public class Main {
                         Task temp = manager.outputEpicById(vybor);
                         System.out.println(temp);
                     } else if (command == 7) {
-                        manager.inputNewTask(name, description, status);
+                        Duration duration = Duration.ofMinutes(10);
+                        LocalDateTime startTime = LocalDateTime.of(2020, 4, 4
+                                , 8, 22, 25);
+                        Task task = new Task(name, description, status, manager.getTaskId()
+                                , duration, startTime);
+                        manager.inputNewTask(task);
                         System.out.println(manager.getDescriptionTasks());
                     } else if (command == 8) {
-                        manager.inputNewEpic(name2, description4);
+                        LocalDateTime startTime = LocalDateTime.of(2021, 4, 4
+                                , 9, 21, 26);
+                        Epic epic = new Epic(name, description, manager.getTaskId(), startTime);
+                        manager.inputNewEpic(epic);
                         System.out.println(manager.getDescriptionEpic());
                     } else if (command == 9) {
+                        Duration duration = Duration.ofMinutes(20);
+                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 4
+                                , 10, 22, 25);
                         System.out.println("Введите № Эпика ");
                         vybor = scanner.nextInt();
-                        manager.inputNewSubTask(name3, description5, status4, vybor);
+                        SubTask subTask = new SubTask(name, description, status, manager.getTaskId()
+                                , vybor, duration, startTime);
+                        manager.inputNewSubTask(subTask, vybor);
                         System.out.println(manager.getDescriptionEpic());
                         Epic epic = manager.getDescriptionEpic().get(vybor);
                         System.out.println(epic.getListSubTask());
                     } else if (command == 10) {
-                        Task task = new Task(nameO, descriptionO, status0, idO);
+                        Duration duration = Duration.ofMinutes(15);
+                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 5
+                                , 8, 22, 25);
+                        Task task = new Task(nameO, descriptionO, status0, idO, duration
+                                , startTime);
                         manager.updateTask(task);
                         System.out.println(manager.getDescriptionTasks());
                     } else if (command == 11) {
-                        Epic epic = new Epic(nameO, descriptionO, idO);
+                        Duration duration = Duration.ofMinutes(15);
+                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 5
+                                , 9, 22, 25);
+                        Epic epic = new Epic(nameO, descriptionO, idO, startTime);
                         manager.updateEpic(epic);
                         System.out.println(manager.getDescriptionEpic());
                     } else if (command == 12) {
+                        Duration duration = Duration.ofMinutes(15);
+                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 5
+                                , 10, 22, 25);
                         System.out.println("начало 12");
-                        SubTask subTask = new SubTask(nameO, descriptionO, status0, idO, epicIdiO);
+                        SubTask subTask = new SubTask(nameO, descriptionO, status0, idO, epicIdiO
+                                , duration, startTime);
                         manager.updateSubTask(subTask);
                         Epic epic = manager.getDescriptionEpic().get(epicIdiO);
                         System.out.println(manager.getDescriptionSubTasks());
@@ -107,14 +134,17 @@ public class Main {
                         for (Task output : histor) {
                             System.out.println(output);
                         }
-                        } else if (command == 0) {
+                    } else if (command == 16) {
+                        manager.printPrioritizedTasks();
+                    } else if (command == 0) {
                         break;
                     }
                 }
             }
         }
     }
-    public static void startTest() throws IOException {
+
+    public static void startTest() throws IOException, ManagerSaveException {
         System.out.println("Сейчас создаю задачи");
         createNewTask();
         createNewTask();
@@ -153,34 +183,47 @@ public class Main {
         watchHistory();
     }
 
-    static void watchTask(int vybor) throws IOException {
+    static void watchTask(int vybor) throws IOException, ManagerSaveException {
         Task temp = manager.outputTaskById(vybor);
         System.out.println("Просмотрена задача № " + vybor);
     }
 
-    static void watchEpic(int vybor) throws IOException {
+    static void watchEpic(int vybor) throws IOException, ManagerSaveException {
         Task temp = manager.outputEpicById(vybor);
         System.out.println("Просмотрен эпик № " + vybor);
     }
 
-    static void createNewTask() throws IOException {
-        manager.inputNewTask(name, description, status);
+    static void createNewTask() throws IOException, ManagerSaveException {
+        Duration duration = Duration.ofMinutes(10);
+        LocalDateTime startTime = LocalDateTime.of(2022, 3, 4
+                , 8, 22, 25);
+        Task task = new Task(name, description, status, manager.getTaskId(), duration, startTime);
+        manager.inputNewTask(task);
         System.out.println("Создана задача");
     }
 
-    static void createNewEpic() throws IOException {
-        manager.inputNewEpic(name2, description4);
+    static void createNewEpic() throws IOException, ManagerSaveException {
+        Duration duration = Duration.ofMinutes(15);
+        LocalDateTime startTime = LocalDateTime.of(2022, 3, 4
+                , 9, 22, 25);
+        Epic epic = new Epic(name, description, manager.getTaskId(), startTime);
+        manager.inputNewEpic(epic);
         System.out.println("Создан эпик");
     }
 
-    static void createNewSubtaskByEpic(int vybor) throws IOException {
-        manager.inputNewSubTask(name3, description5, status4, vybor);
+    static void createNewSubtaskByEpic(int vybor) throws IOException, ManagerSaveException {
+        Duration duration = Duration.ofMinutes(20);
+        LocalDateTime startTime = LocalDateTime.of(2022, 3, 4
+                , 10, 22, 25);
+        System.out.println("Введите № Эпика ");
+        SubTask subTask = new SubTask(name, description, status, manager.getTaskId()
+                , vybor, duration, startTime);
+        manager.inputNewSubTask(subTask, vybor);
         System.out.println(manager.getDescriptionEpic());
-        Epic epic = manager.getDescriptionEpic().get(vybor);
         System.out.println("Создана подзадача для эпика № " + vybor);
     }
 
-    static void deleteTaskById(int vybor) throws IOException {
+    static void deleteTaskById(int vybor) throws IOException, ManagerSaveException {
         manager.deletTaskById(vybor);
         System.out.println("Удалена задача № " + vybor);
     }
@@ -208,9 +251,8 @@ public class Main {
         System.out.println("13 - Удалить задачу или эпик по ID номеру");
         System.out.println("14 - Удалить все задачи");
         System.out.println("15 - Посмотреть историю просмотра задач");
-        System.out.println("16 - Запустить тест");
+        System.out.println("16 - Вывести список заддач отсортированных по дате начала");
         System.out.println("0 - Завершить работу приложения.");
     }
 }
-*/
 

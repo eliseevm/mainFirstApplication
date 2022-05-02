@@ -45,12 +45,12 @@ public interface TaskManager {
     Epic outputEpicById(int numberTask) throws IOException, ManagerSaveException;
 
     // Метод ввода новой задачи
-    void inputNewTask(String name, String description, Status status) throws IOException, ManagerSaveException;
+    void inputNewTask(Task task) throws IOException, ManagerSaveException;
     // Метод ввода нового эпика
-    void inputNewEpic(String name, String description) throws IOException, ManagerSaveException;
+    void inputNewEpic(Epic epic) throws IOException, ManagerSaveException;
 
     // Метод ввода новой подзадачи
-    void inputNewSubTask(String name, String description, Status status, int epicId) throws IOException, ManagerSaveException;
+    void inputNewSubTask(SubTask subTask, int epicId) throws IOException, ManagerSaveException;
 
     // Метод для обновления задач по номеру.
     void updateTask(Task task);
