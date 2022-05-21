@@ -2,6 +2,7 @@ package manager;
 
 import logic.Epic;
 import logic.Task;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,24 +16,23 @@ class HistoryManagerTest {
 
     LocalDateTime startTimeTask = LocalDateTime.of(2022, 4, 4
             , 8, 22, 25);
+    LocalDateTime startTimeTask1 = LocalDateTime.of(2022, 4, 4
+            , 7, 22, 25);
     Duration durationTask = Duration.ofMinutes(20);
     LocalDateTime startTimeSubTask = LocalDateTime.of(2022, 4, 5
             , 8, 22, 25);
-    LocalDateTime startTimeEpic = LocalDateTime.of(2022, 4, 3
-            , 8, 22, 25);
     Duration durationSubTask = Duration.ofMinutes(18);
-    
+
     InMemoryTaskManager ex = new InMemoryTaskManager();
+
     @BeforeEach
-            void historyTest () throws IOException, ManagerSaveException {
+    void historyTest() throws IOException, ManagerSaveException {
         ex.inputNewTask(new Task("name", "описание", Status.NEW
                 , 0, durationTask, startTimeTask));
-        ex.inputNewEpic(new Epic("name", "описание", 1
-                , startTimeEpic));
-        ex.inputNewEpic(new Epic("name", "описание", 2
-                , startTimeEpic));
+        ex.inputNewEpic(new Epic("name", "описание", 1));
+        ex.inputNewEpic(new Epic("name", "описание", 2));
         ex.inputNewTask(new Task("name", "описание", Status.DONE
-                , 3, durationTask, startTimeTask));
+                , 3, durationTask, startTimeTask1));
         ex.outputTaskById(0);
         ex.outputTaskById(3);
         ex.outputEpicById(1);
@@ -48,7 +48,7 @@ class HistoryManagerTest {
     }
 
     @Test
-    void remove() throws IOException, ManagerSaveException {
+    void remove() {
         InMemoryHistoryManager.Node<Task> e = ex.getHistoryManager().getTempNodeMap().get(1);
         ex.getHistoryManager().getTempNodeMap().remove(1);
         InMemoryHistoryManager.Node<Task> r = ex.getHistoryManager().getTempNodeMap().get(1);

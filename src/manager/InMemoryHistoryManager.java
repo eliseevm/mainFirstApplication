@@ -12,7 +12,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node<Task> head; // Голова двусвязного списка
     private Node<Task> tail; // Хвост двусвязного списка
 
-
     // Метод возвращает вспомогательную таблицу для учета просмотренных задач
     public HashMap<Integer, Node<Task>> getTempNodeMap() {
         return tempNodeMap;

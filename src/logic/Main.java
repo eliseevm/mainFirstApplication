@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
-
 public class Main {
 
     static InMemoryTaskManager manager = new InMemoryTaskManager();
@@ -32,7 +31,6 @@ public class Main {
     static Status status4 = Status.DONE;
 
     public static void main(String[] args) throws IOException, ManagerSaveException {
-
 
         while (true) {
             System.out.println("Привет! ручное тестирование - 1; автоматическое - 2; Выход - 0");
@@ -72,21 +70,21 @@ public class Main {
                         System.out.println(temp);
                     } else if (command == 7) {
                         Duration duration = Duration.ofMinutes(10);
-                        LocalDateTime startTime = LocalDateTime.of(2020, 4, 4
+                        LocalDateTime startTime = LocalDateTime.of(2022, 6, 4
                                 , 8, 22, 25);
                         Task task = new Task(name, description, status, manager.getTaskId()
                                 , duration, startTime);
                         manager.inputNewTask(task);
                         System.out.println(manager.getDescriptionTasks());
                     } else if (command == 8) {
-                        LocalDateTime startTime = LocalDateTime.of(2021, 4, 4
+                        LocalDateTime startTime = LocalDateTime.of(2022, 6, 5
                                 , 9, 21, 26);
-                        Epic epic = new Epic(name, description, manager.getTaskId(), startTime);
+                        Epic epic = new Epic(name, description, manager.getTaskId());
                         manager.inputNewEpic(epic);
                         System.out.println(manager.getDescriptionEpic());
                     } else if (command == 9) {
                         Duration duration = Duration.ofMinutes(20);
-                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 4
+                        LocalDateTime startTime = LocalDateTime.of(2022, 6, 6
                                 , 10, 22, 25);
                         System.out.println("Введите № Эпика ");
                         vybor = scanner.nextInt();
@@ -98,7 +96,7 @@ public class Main {
                         System.out.println(epic.getListSubTask());
                     } else if (command == 10) {
                         Duration duration = Duration.ofMinutes(15);
-                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 5
+                        LocalDateTime startTime = LocalDateTime.of(2022, 6, 7
                                 , 8, 22, 25);
                         Task task = new Task(nameO, descriptionO, status0, idO, duration
                                 , startTime);
@@ -106,14 +104,14 @@ public class Main {
                         System.out.println(manager.getDescriptionTasks());
                     } else if (command == 11) {
                         Duration duration = Duration.ofMinutes(15);
-                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 5
+                        LocalDateTime startTime = LocalDateTime.of(2022, 6, 8
                                 , 9, 22, 25);
-                        Epic epic = new Epic(nameO, descriptionO, idO, startTime);
+                        Epic epic = new Epic(nameO, descriptionO, idO);
                         manager.updateEpic(epic);
                         System.out.println(manager.getDescriptionEpic());
                     } else if (command == 12) {
                         Duration duration = Duration.ofMinutes(15);
-                        LocalDateTime startTime = LocalDateTime.of(2022, 4, 5
+                        LocalDateTime startTime = LocalDateTime.of(2022, 6, 9
                                 , 10, 22, 25);
                         System.out.println("начало 12");
                         SubTask subTask = new SubTask(nameO, descriptionO, status0, idO, epicIdiO
@@ -135,7 +133,10 @@ public class Main {
                             System.out.println(output);
                         }
                     } else if (command == 16) {
-                        manager.printPrioritizedTasks();
+                        System.out.println("Печатаю СЕТ");
+                        for (Task task : manager.getPrioritizedTasks()) {
+                            System.out.println(task);
+                        }
                     } else if (command == 0) {
                         break;
                     }
@@ -206,7 +207,7 @@ public class Main {
         Duration duration = Duration.ofMinutes(15);
         LocalDateTime startTime = LocalDateTime.of(2022, 3, 4
                 , 9, 22, 25);
-        Epic epic = new Epic(name, description, manager.getTaskId(), startTime);
+        Epic epic = new Epic(name, description, manager.getTaskId());
         manager.inputNewEpic(epic);
         System.out.println("Создан эпик");
     }

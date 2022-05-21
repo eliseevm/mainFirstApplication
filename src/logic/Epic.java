@@ -10,19 +10,21 @@ import java.util.Objects;
 public class Epic extends Task {
 
     private ArrayList<SubTask> listSubTask;
-    Status status;
-    Duration duration = Duration.ofMinutes(0);
+    private Status status;
+    private Duration duration;
+    private LocalDateTime endTime = LocalDateTime.now().plusSeconds(1);
+    private LocalDateTime startTime;
 
-    public Epic(String name, String description, int id, LocalDateTime startTime) {
-        super(name, description, id, startTime);
+    public Epic(String name, String description, int id) {
+        super(name, description, id);
         listSubTask = new ArrayList<>();
-
+        status = getStatus();
+        startTime = LocalDateTime.now().plusSeconds(id);
     }
 
     public ArrayList<SubTask> getListSubTask() {
         return listSubTask;
     }
-
 
     // Метод актуализации статуса эпика в зависимости от состояния статуса подзадач
     @Override
@@ -56,13 +58,43 @@ public class Epic extends Task {
     // продолжительность эпика
     @Override
     public Duration getDuration() {
-        duration = Duration.ofMinutes(0);
         ArrayList<SubTask> temp = getListSubTask();
         for (SubTask subTask : temp) {
             Duration durationST = subTask.getDuration();
-            duration = duration.plus(durationST);
+            this.duration = duration.plus(durationST);
         }
         return duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (listSubTask.size() != 0) {
+            int i = (listSubTask.size()) - 1;
+            SubTask temp = listSubTask.get(i);
+            LocalDateTime endTimeSt = temp.getEndTime();
+            if (endTimeSt.isAfter(endTime)) {
+                endTime = endTimeSt;
+
+            }
+            return endTime;
+        }
+        return endTime;
+    }
+
+    // Метод возвращает время начала Эпика
+    @Override
+    public LocalDateTime getStartTime() {
+        if (listSubTask != null) {
+            for (int i = 0; i < listSubTask.size(); i++) {
+                SubTask temp = listSubTask.get(i);
+                LocalDateTime sT = temp.getStartTime();
+                startTime = listSubTask.get(0).getStartTime();
+                if (sT.isBefore(startTime)) {
+                    startTime = sT;
+                }
+            }
+            return startTime;
+        }
+        return startTime;
     }
 
     @Override
@@ -71,19 +103,24 @@ public class Epic extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return listSubTask.equals(epic.listSubTask)
-                && status == epic.status && duration.equals(epic.duration);
+        return listSubTask.equals(epic.listSubTask) && status == epic.status
+                && duration.equals(epic.duration) && endTime.equals(epic.endTime)
+                && startTime.equals(epic.startTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), listSubTask, status, duration);
+        return Objects.hash(super.hashCode(), listSubTask, status, duration, endTime, startTime);
     }
 
     @Override
     public String toString() {
         return "Epic{" +
                 "listSubTask=" + listSubTask +
+                ", status=" + status +
+                ", duration=" + duration +
+                ", endTime=" + endTime +
+                ", startTime=" + startTime +
                 '}';
     }
 }

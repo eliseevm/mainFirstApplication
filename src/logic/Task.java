@@ -14,7 +14,7 @@ public class Task {
     private int id;
     private Duration duration;
     private LocalDateTime startTime;
-
+    private LocalDateTime endTime;
 
     public Task(String name, String description, Status status, int id, Duration duration
             , LocalDateTime startTime) {
@@ -26,12 +26,10 @@ public class Task {
         this.duration = duration;
     }
 
-
-    public Task(String name, String description, int id, LocalDateTime startTime) {
+    public Task(String name, String description, int id) {
         this.name = name;
         this.description = description;
         this.id = id;
-        this.startTime = startTime;
     }
 
     public String getName() {
@@ -58,6 +56,11 @@ public class Task {
         return startTime;
     }
 
+    public LocalDateTime getEndTime() {
+        this.endTime = startTime.plusSeconds(this.getDuration().toSeconds());
+        return endTime;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -72,14 +75,14 @@ public class Task {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return id == task.id && name.equals(task.name)
-                && description.equals(task.description)
-                && status == task.status && duration.equals(task.duration)
-                && startTime.equals(task.startTime);
+                && description.equals(task.description) && status == task.status
+                && duration.equals(task.duration) && startTime.equals(task.startTime)
+                && endTime.equals(task.endTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, status, id, duration, startTime);
+        return Objects.hash(name, description, status, id, duration, startTime, endTime);
     }
 
     @Override
@@ -91,6 +94,7 @@ public class Task {
                 ", id=" + id +
                 ", duration=" + duration +
                 ", startTime=" + startTime +
+                ", endTime=" + endTime +
                 '}';
     }
 }

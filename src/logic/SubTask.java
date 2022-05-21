@@ -8,18 +8,17 @@ import java.util.Objects;
 
 public class SubTask extends Task {
 
-    private  int epicId;
+    private int epicId;
 
-    public SubTask(String name, String description, Status status, int id, int epicId, Duration duration
-            , LocalDateTime startTime) {
+    public SubTask(String name, String description, Status status, int id, int epicId
+            , Duration duration, LocalDateTime startTime) {
         super(name, description, status, id, duration, startTime);
         this.epicId = epicId;
     }
 
-
-   public int getEpicId() {
-       return epicId;
-   }
+    public int getEpicId() {
+        return epicId;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -42,6 +41,8 @@ public class SubTask extends Task {
                 '}';
     }
 }
+
+
 
 
 
