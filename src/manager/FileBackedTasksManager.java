@@ -21,77 +21,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     private final HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
     private final HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
     private List<Task> historyList;
-
-    // Метод для проверки правильности восстановления менеджера
-    public static void main(String[] args) throws IOException, ManagerSaveException {
-      /* Duration durationTask = Duration.ofMinutes(2);
-        LocalDateTime startTimeTask = LocalDateTime.of(2022, 6, 3
-                , 8, 22, 25);
-        LocalDateTime startTimeTask2 = LocalDateTime.of(2022, 5, 28
-                , 8, 22, 25);
-        LocalDateTime startTimeTask1 = LocalDateTime.of(2022, 6, 4
-                , 8, 22, 25);
-        Duration durationSubTask = Duration.ofMinutes(180);
-        LocalDateTime startTimeSubTask = LocalDateTime.of(2022, 9, 5
-                , 8, 22, 25);
-        LocalDateTime startTimeSubTask1 = LocalDateTime.of(2022, 10, 5
-                , 8, 22, 25);
-        LocalDateTime startTimeSubTask2 = LocalDateTime.of(2022, 10, 5
-                , 18, 22, 25);
-        LocalDateTime startTimeSubTask3 = LocalDateTime.of(2022, 10, 5
-                , 23, 22, 25);
-        FileBackedTasksManager manager3 =
-                new FileBackedTasksManager(new File("src/history.csv"));
-        manager3.inputNewTask(new Task("name", "description"
-                , Status.NEW, manager3.getTaskId(), durationTask, startTimeTask));
-        manager3.inputNewEpic(new Epic("name", "description"
-                , manager3.getTaskId()));
-        manager3.inputNewSubTask(new SubTask("name", "description"
-                , Status.DONE, manager3.getTaskId(), 1, durationSubTask
-                , startTimeSubTask), 1);
-        manager3.inputNewSubTask(new SubTask("name", "description"
-                , Status.DONE, manager3.getTaskId(), 1, durationSubTask
-                , startTimeSubTask1), 1);
-        manager3.inputNewTask(new Task("name", "description"
-                , Status.NEW, manager3.getTaskId(), durationTask, startTimeTask1));
-        manager3.inputNewTask(new Task("name", "description"
-                , Status.NEW, manager3.getTaskId(), durationTask, startTimeTask2));
-        manager3.inputNewEpic(new Epic("name", "description"
-                , manager3.getTaskId()));
-        manager3.inputNewSubTask(new SubTask("name", "description"
-                , Status.DONE, manager3.getTaskId(), 6, durationSubTask
-                , startTimeSubTask2), 6);
-        manager3.inputNewSubTask(new SubTask("name", "description"
-                , Status.DONE, manager3.getTaskId(), 6, durationSubTask
-                , startTimeSubTask3), 6);
-        manager3.outputTaskById(0);
-        manager3.outputTaskById(5);
-        manager3.outputEpicById(1);
-        manager3.outputEpicById(6);
-        manager3.outputSubTaskById(3);
-        manager3.outputSubTaskById(2);
-        manager3.outputTaskById(4);
-        for (Task task : manager3.getPrioritizedTasks()) {
-           System.out.println("Печатаем СЕТ: " + task);
-       }
-       FileBackedTasksManager manager4 = loadFromFile(new File("src/history.csv"));
-        manager4.fromString();
-        boolean n = (manager3.getHistory().size()
-                == manager4.getHistory().size());
-        boolean m = (manager3.getDescriptionEpic().size()
-                == manager4.getDescriptionEpic().size());
-       boolean s = (manager3.getDescriptionTasks().equals(manager4.getDescriptionTasks()));
-       boolean d = (manager3.getDescriptionSubTasks().equals(manager4.getDescriptionSubTasks()));
-        System.out.println("Если восстановление верно выводим TRUE если нет FALSE");
-        System.out.println("История - " + n);
-        System.out.println("Эпики - " + m);
-        System.out.println("Задачи - " + s);
-        System.out.println("Подзадачи - " + d);
-        manager4.sorted();
-        for (Task task : manager4.getPrioritizedTasks()) {
-            System.out.println("Печатаем СЕТ: " + task);
-       }*/
-    }
+    
 
     // Метод возвращает менеджер с восстановленными мз файла параметрами
     public static FileBackedTasksManager loadFromFile(File file) throws IOException
