@@ -23,7 +23,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
     InMemoryTaskManager manager = new InMemoryTaskManager();
 
-    Duration durationTask = Duration.ofMinutes(10);
+    int durationSubTask = 20;
+    int durationTask = 10;
     LocalDateTime startTimeTask = LocalDateTime.of(2022, 7, 7
             , 8, 22, 25);
     LocalDateTime startTimeTask1 = LocalDateTime.of(2022, 8, 8
@@ -32,7 +33,6 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
             , 8, 22, 25);
     LocalDateTime startTimeTask3 = LocalDateTime.of(2022, 10, 9
             , 11, 22, 25);
-    Duration durationSubTask = Duration.ofMinutes(20);
     LocalDateTime startTimeSubTask = LocalDateTime.of(2022, 11, 10
             , 8, 22, 25);
     LocalDateTime startTimeSubTask1 = LocalDateTime.of(2022, 12, 11
@@ -47,9 +47,9 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         manager.inputNewEpic(new Epic("name", "description", 1));
         manager.inputNewEpic(new Epic("name", "description", 2));
         manager.inputNewSubTask(new SubTask("name", "description", Status.NEW
-                , 3, 1, durationSubTask, startTimeSubTask), 1);
+                , 3, 1, durationSubTask, startTimeSubTask));
         manager.inputNewSubTask(new SubTask("name", "description", Status.DONE
-                , 4, 1, durationSubTask, startTimeSubTask1), 1);
+                , 4, 1, durationSubTask, startTimeSubTask1));
         manager.inputNewTask(new Task("name", "description", Status.DONE
                 , 5, durationTask, startTimeTask1));
         manager.inputNewTask(new Task("name", "description", Status.NEW
@@ -68,12 +68,12 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     void sorted() throws IOException, ManagerSaveException {
         manager.inputNewEpic(new Epic("Сортировочный", "Для проверки", 7));
         manager.sorted();
-        assertEquals(8, manager.getPrioritizedTasks().size());
+        assertEquals(5, manager.getPrioritizedTasks().size());
     }
 
     @Test
     void getPrioritizedTasks() {
-        assertEquals(7, manager.getPrioritizedTasks().size());
+        assertEquals(5, manager.getPrioritizedTasks().size());
     }
 
     @Test

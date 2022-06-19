@@ -23,7 +23,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         this.taskManager = taskManager;
     }
 
-    Duration durationTask = Duration.ofMinutes(10);
+    int durationTask = 10;
     LocalDateTime startTimeTask = LocalDateTime.of(2022, 7, 7
             , 8, 22, 25);
     LocalDateTime startTimeTask1 = LocalDateTime.of(2022, 7, 8
@@ -32,7 +32,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
             , 8, 22, 25);
     LocalDateTime startTimeTask3 = LocalDateTime.of(2022, 8, 9
             , 11, 22, 25);
-    Duration durationSubTask = Duration.ofMinutes(20);
+    int durationSubTask = 20;
     LocalDateTime startTimeSubTask = LocalDateTime.of(2022, 9, 10
             , 8, 22, 25);
     LocalDateTime startTimeSubTask1 = LocalDateTime.of(2022, 10, 11
@@ -48,9 +48,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.inputNewEpic(new Epic("name", "description", 1));
         taskManager.inputNewEpic(new Epic("name", "description", 2));
         taskManager.inputNewSubTask(new SubTask("name", "description", Status.NEW
-                , 3, 1, durationSubTask, startTimeSubTask), 1);
+                , 3, 1, durationSubTask, startTimeSubTask));
         taskManager.inputNewSubTask(new SubTask("name", "description", Status.DONE
-                , 4, 1, durationSubTask, startTimeSubTask1), 1);
+                , 4, 1, durationSubTask, startTimeSubTask1));
         taskManager.inputNewTask(new Task("name", "description", Status.DONE
                 , 5, durationTask, startTimeTask1));
         taskManager.inputNewTask(new Task("name", "description", Status.NEW
@@ -67,21 +67,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testGetDescriptionTasks() throws IOException, ManagerSaveException {
         assertEquals(3, taskManager.getDescriptionTasks().size());
-        taskManager.deletAllTasks();
+        taskManager.deleteAllTasks();
         assertEquals(0, taskManager.getDescriptionTasks().size());
     }
 
     @Test
     void testGetDescriptionSubTasks() throws IOException, ManagerSaveException {
         assertEquals(2, taskManager.getDescriptionSubTasks().size());
-        taskManager.deletAllTasks();
+        taskManager.deleteAllTasks();
         assertEquals(0, taskManager.getDescriptionSubTasks().size());
     }
 
     @Test
     void testGetDescriptionEpic() throws IOException, ManagerSaveException {
         assertEquals(2, taskManager.getDescriptionEpic().size());
-        taskManager.deletAllTasks();
+        taskManager.deleteAllTasks();
         assertEquals(0, taskManager.getDescriptionEpic().size());
     }
 
@@ -93,15 +93,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testGetHistory() throws IOException, ManagerSaveException {
         assertEquals(1, taskManager.getHistory().get(2).getId());
-        taskManager.deletAllTasks();
-        assertEquals(5, taskManager.getHistory().get(1).getId());
-        assertEquals(7, taskManager.getHistory().size());
     }
 
     @Test
     void testOutputAllTask() throws IOException, ManagerSaveException {
         assertEquals(3, taskManager.outputAllTask().size());
-        taskManager.deletAllTasks();
+        taskManager.deleteAllTasks();
         assertEquals(0, taskManager.outputAllTask().size());
         taskManager.inputNewTask(new Task("name", "description", Status.DONE
                 , 0, durationTask, startTimeTask1));
@@ -111,7 +108,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testOutputAllEpics() throws IOException, ManagerSaveException {
         assertEquals(2, taskManager.outputAllEpics().size());
-        taskManager.deletTaskById(2);
+        taskManager.deleteTaskById(2);
         assertEquals(1, taskManager.getDescriptionEpic().size());
     }
 
@@ -157,8 +154,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testInputNewSubTask() throws IOException, ManagerSaveException {
         assertEquals(2, taskManager.getDescriptionSubTasks().size());
-        taskManager.inputNewSubTask(new SubTask("name", "description", Status.IN_PROGRESS
-                , 9, 1, durationSubTask, startTimeSubTask2), 1);
+        taskManager.inputNewSubTask(new SubTask("name", "description"
+                , Status.IN_PROGRESS
+                , 9, 1, durationSubTask, startTimeSubTask2));
         assertEquals(3, taskManager.getDescriptionSubTasks().size());
     }
 
@@ -174,7 +172,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testUpdateSubTask() {
-        taskManager.updateSubTask(new SubTask("Обновленная", "description", Status.NEW
+        taskManager.updateSubTask(new SubTask("Обновленная", "description"
+                , Status.NEW
                 , 3, 1, durationSubTask, startTimeSubTask));
         ;
         assertEquals(2, taskManager.getDescriptionSubTasks().size());
@@ -190,14 +189,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void testDeletTaskById() throws IOException, ManagerSaveException {
-        taskManager.deletTaskById(0);
+        taskManager.deleteTaskById(0);
         assertEquals(2, taskManager.getDescriptionTasks().size());
         assertNull(taskManager.getDescriptionTasks().get(0));
     }
 
     @Test
     void testDeletAllTasks() throws IOException, ManagerSaveException {
-        taskManager.deletAllTasks();
+        taskManager.deleteAllTasks();
         assertNull(taskManager.getDescriptionEpic().get(1));
         assertNull(taskManager.getDescriptionTasks().get(0));
         assertNull(taskManager.getDescriptionSubTasks().get(3));

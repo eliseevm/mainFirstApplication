@@ -21,7 +21,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         историю просмотра задач */
     @Override
     public void add(Task task) {
-        int taskId = task.getId();
+            int taskId = task.getId();
         if (tempNodeMap.containsKey(taskId)) {
             Node<Task> tempNode = tempNodeMap.get(taskId);
             remove(taskId);

@@ -4,19 +4,20 @@ import manager.Status;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
 
     private String name;
     private String description;
-    private Status status;
+    Status status;
     private int id;
-    private Duration duration;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+     int duration;
+     LocalDateTime startTime;
+     LocalDateTime endTime;
 
-    public Task(String name, String description, Status status, int id, Duration duration
+    public Task(String name, String description, Status status, int id, int duration
             , LocalDateTime startTime) {
         this.name = name;
         this.description = description;
@@ -24,6 +25,7 @@ public class Task {
         this.id = id;
         this.startTime = startTime;
         this.duration = duration;
+        this.endTime = getEndTime();
     }
 
     public Task(String name, String description, int id) {
@@ -48,7 +50,7 @@ public class Task {
         return id;
     }
 
-    public Duration getDuration() {
+    public int getDuration() {
         return duration;
     }
 
@@ -57,7 +59,7 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        this.endTime = startTime.plusSeconds(this.getDuration().toSeconds());
+        this.endTime = startTime.plusMinutes(this.getDuration());
         return endTime;
     }
 
@@ -74,10 +76,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && name.equals(task.name)
-                && description.equals(task.description) && status == task.status
-                && duration.equals(task.duration) && startTime.equals(task.startTime)
-                && endTime.equals(task.endTime);
+        return id == task.id && duration == task.duration && name.equals(task.name) && description.equals(task.description) && status == task.status && startTime.equals(task.startTime) && endTime.equals(task.endTime);
     }
 
     @Override

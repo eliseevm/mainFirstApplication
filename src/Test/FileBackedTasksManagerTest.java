@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
-    FileBackedTasksManager manager3 =
+   FileBackedTasksManager manager3 =
             new FileBackedTasksManager(new File("src/history.csv"));
 
     public FileBackedTasksManagerTest() {
@@ -25,8 +25,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     @Test
     void testStartManager() throws IOException, ManagerSaveException {
-        Duration durationTask = Duration.ofMinutes(10);
-        Duration durationSubTask = Duration.ofMinutes(10);
+        int durationTask = 10;
+        int durationSubTask = 10;
         LocalDateTime startTimeTask = LocalDateTime.of(2022, 6, 3
                 , 8, 22, 25);
         LocalDateTime startTimeTask2 = LocalDateTime.of(2022, 5, 28
@@ -48,10 +48,10 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
                 , manager3.getTaskId()));
         manager3.inputNewSubTask(new SubTask("name", "description"
                 , Status.DONE, manager3.getTaskId(), 1, durationSubTask
-                , startTimeSubTask), 1);
+                , startTimeSubTask));
         manager3.inputNewSubTask(new SubTask("name", "description"
                 , Status.DONE, manager3.getTaskId(), 1, durationSubTask
-                , startTimeSubTask1), 1);
+                , startTimeSubTask1));
         manager3.inputNewTask(new Task("name", "description"
                 , Status.NEW, manager3.getTaskId(), durationTask, startTimeTask1));
         manager3.inputNewTask(new Task("name", "description"
@@ -60,10 +60,10 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
                 , manager3.getTaskId()));
         manager3.inputNewSubTask(new SubTask("name", "description"
                 , Status.DONE, manager3.getTaskId(), 6, durationSubTask
-                , startTimeSubTask2), 6);
+                , startTimeSubTask2));
         manager3.inputNewSubTask(new SubTask("name", "description"
                 , Status.DONE, manager3.getTaskId(), 6, durationSubTask
-                , startTimeSubTask3), 6);
+                , startTimeSubTask3));
         manager3.outputTaskById(0);
         manager3.outputTaskById(5);
         manager3.outputEpicById(1);

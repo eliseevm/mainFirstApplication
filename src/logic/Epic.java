@@ -10,20 +10,25 @@ import java.util.Objects;
 public class Epic extends Task {
 
     private ArrayList<SubTask> listSubTask;
-    private Status status;
-    private Duration duration;
-    private LocalDateTime endTime = LocalDateTime.now().plusSeconds(1);
-    private LocalDateTime startTime;
+    //private Duration duration;
+    //private LocalDateTime endTime;
+    //private LocalDateTime startTime = LocalDateTime.now();
 
     public Epic(String name, String description, int id) {
         super(name, description, id);
         listSubTask = new ArrayList<>();
-        status = getStatus();
-        startTime = LocalDateTime.now().plusSeconds(id);
+        duration = getDuration();
+       //endTime = getEndTime();
+
     }
 
     public ArrayList<SubTask> getListSubTask() {
-        return listSubTask;
+        ArrayList<SubTask>list = null;
+        if (listSubTask==null) {
+            System.out.println("У этого эпика пока нет списка задач!");
+        } else if (listSubTask != null) {
+            list = listSubTask;
+        } return list;
     }
 
     // Метод актуализации статуса эпика в зависимости от состояния статуса подзадач
@@ -57,11 +62,11 @@ public class Epic extends Task {
     // Метод устанавливает продолжительность эпика в зависимости от saubtask, возвращает новую
     // продолжительность эпика
     @Override
-    public Duration getDuration() {
+    public int getDuration() {
         ArrayList<SubTask> temp = getListSubTask();
         for (SubTask subTask : temp) {
-            Duration durationST = subTask.getDuration();
-            this.duration = duration.plus(durationST);
+            int durationST = subTask.getDuration();
+            duration = duration + durationST;
         }
         return duration;
     }
@@ -72,10 +77,12 @@ public class Epic extends Task {
             SubTask temp = listSubTask.get(i);
             LocalDateTime endTimeSt = temp.getEndTime();
             if (endTimeSt.isAfter(endTime)) {
-                endTime = endTimeSt;
+                this.endTime = endTimeSt;
 
             }
             return endTime;
+        } else if (listSubTask.size() == 0) {
+            System.out.println("У Эпика пока нет подзадач, время окончания  не определено!");
         }
         return endTime;
     }
@@ -94,6 +101,7 @@ public class Epic extends Task {
             }
             return startTime;
         }
+        System.out.println("У Эпика пока нет подзадач, время начала не определено!");
         return startTime;
     }
 
@@ -103,14 +111,12 @@ public class Epic extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return listSubTask.equals(epic.listSubTask) && status == epic.status
-                && duration.equals(epic.duration) && endTime.equals(epic.endTime)
-                && startTime.equals(epic.startTime);
+        return listSubTask.equals(epic.listSubTask);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), listSubTask, status, duration, endTime, startTime);
+        return Objects.hash(super.hashCode(), listSubTask);
     }
 
     @Override
@@ -119,8 +125,8 @@ public class Epic extends Task {
                 "listSubTask=" + listSubTask +
                 ", status=" + status +
                 ", duration=" + duration +
-                ", endTime=" + endTime +
                 ", startTime=" + startTime +
+                ", endTime=" + endTime +
                 '}';
     }
 }

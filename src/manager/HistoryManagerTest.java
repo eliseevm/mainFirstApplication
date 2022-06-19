@@ -18,10 +18,9 @@ class HistoryManagerTest {
             , 8, 22, 25);
     LocalDateTime startTimeTask1 = LocalDateTime.of(2022, 4, 4
             , 7, 22, 25);
-    Duration durationTask = Duration.ofMinutes(20);
+    int durationTask = 20;
     LocalDateTime startTimeSubTask = LocalDateTime.of(2022, 4, 5
             , 8, 22, 25);
-    Duration durationSubTask = Duration.ofMinutes(18);
 
     InMemoryTaskManager ex = new InMemoryTaskManager();
 

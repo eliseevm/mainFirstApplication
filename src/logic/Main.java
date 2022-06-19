@@ -1,4 +1,4 @@
-package logic;
+/*package logic;
 
 import manager.InMemoryTaskManager;
 import manager.ManagerSaveException;
@@ -26,7 +26,7 @@ public class Main {
     static String description4 = "Описание Эпика";
     static String description5 = "Описание подзадачи";
     static String descriptionO = "Обновился Sub";
-    static Status status = Status.NEW;
+    static Status status = Status.IN_PROGRESS;
     static Status status0 = Status.DONE;
     static Status status4 = Status.DONE;
 
@@ -51,8 +51,12 @@ public class Main {
                     } else if (command == 3) {
                         System.out.println("Введите № эпика");
                         vybor = scanner.nextInt();
-                        System.out.println("Это все подзадачи по эпику : " + manager
-                                .outputSubtaskByEpik(vybor));
+                        try {
+                            System.out.println("Это все подзадачи по эпику : " + manager
+                                    .outputSubtaskByEpik(vybor));
+                        } catch (NullPointerException ex) {
+                            System.out.println("Печатать пока нечего");
+                        }
                     } else if (command == 4) {
                         System.out.println("Введите №");
                         vybor = scanner.nextInt();
@@ -62,14 +66,18 @@ public class Main {
                         System.out.println("Введите №");
                         vybor = scanner.nextInt();
                         Task temp = manager.outputSubTaskById(vybor);
-                        System.out.println(temp);
+                       try {
+                           System.out.println(temp);
+                       } catch (NullPointerException ex) {
+                           System.out.println("Такой задачи пока нет!");
+                       }
                     } else if (command == 6) {
                         System.out.println("Введите №");
                         vybor = scanner.nextInt();
                         Task temp = manager.outputEpicById(vybor);
                         System.out.println(temp);
                     } else if (command == 7) {
-                        Duration duration = Duration.ofMinutes(10);
+                        int duration = 10;
                         LocalDateTime startTime = LocalDateTime.of(2022, 6, 4
                                 , 8, 22, 25);
                         Task task = new Task(name, description, status, manager.getTaskId()
@@ -83,19 +91,23 @@ public class Main {
                         manager.inputNewEpic(epic);
                         System.out.println(manager.getDescriptionEpic());
                     } else if (command == 9) {
-                        Duration duration = Duration.ofMinutes(20);
+                        int duration = 20;
                         LocalDateTime startTime = LocalDateTime.of(2022, 6, 6
                                 , 10, 22, 25);
                         System.out.println("Введите № Эпика ");
                         vybor = scanner.nextInt();
                         SubTask subTask = new SubTask(name, description, status, manager.getTaskId()
                                 , vybor, duration, startTime);
-                        manager.inputNewSubTask(subTask, vybor);
+                        manager.inputNewSubTask(subTask);
                         System.out.println(manager.getDescriptionEpic());
                         Epic epic = manager.getDescriptionEpic().get(vybor);
-                        System.out.println(epic.getListSubTask());
+                        try {
+                            System.out.println(epic.getListSubTask());
+                        } catch (NullPointerException ex) {
+                            System.out.println("Печатать пока нечего");
+                        }
                     } else if (command == 10) {
-                        Duration duration = Duration.ofMinutes(15);
+                        int duration = 15;
                         LocalDateTime startTime = LocalDateTime.of(2022, 6, 7
                                 , 8, 22, 25);
                         Task task = new Task(nameO, descriptionO, status0, idO, duration
@@ -103,14 +115,14 @@ public class Main {
                         manager.updateTask(task);
                         System.out.println(manager.getDescriptionTasks());
                     } else if (command == 11) {
-                        Duration duration = Duration.ofMinutes(15);
+                        int duration = 15;
                         LocalDateTime startTime = LocalDateTime.of(2022, 6, 8
                                 , 9, 22, 25);
                         Epic epic = new Epic(nameO, descriptionO, idO);
                         manager.updateEpic(epic);
                         System.out.println(manager.getDescriptionEpic());
                     } else if (command == 12) {
-                        Duration duration = Duration.ofMinutes(15);
+                        int duration = 15;
                         LocalDateTime startTime = LocalDateTime.of(2022, 6, 9
                                 , 10, 22, 25);
                         System.out.println("начало 12");
@@ -123,10 +135,10 @@ public class Main {
                     } else if (command == 13) {
                         System.out.println("Введите № задачи ");
                         vybor = scanner.nextInt();
-                        manager.deletTaskById(vybor);
+                        manager.deleteTaskById(vybor);
                         System.out.println(manager.getDescriptionTasks());
                     } else if (command == 14) {
-                        manager.deletAllTasks();
+                        manager.deleteAllTasks();
                     } else if (command == 15) {
                         List<Task> histor = manager.getHistory();
                         for (Task output : histor) {
@@ -195,7 +207,7 @@ public class Main {
     }
 
     static void createNewTask() throws IOException, ManagerSaveException {
-        Duration duration = Duration.ofMinutes(10);
+        int duration = 10;
         LocalDateTime startTime = LocalDateTime.of(2022, 3, 4
                 , 8, 22, 25);
         Task task = new Task(name, description, status, manager.getTaskId(), duration, startTime);
@@ -204,7 +216,7 @@ public class Main {
     }
 
     static void createNewEpic() throws IOException, ManagerSaveException {
-        Duration duration = Duration.ofMinutes(15);
+        int duration = 15;
         LocalDateTime startTime = LocalDateTime.of(2022, 3, 4
                 , 9, 22, 25);
         Epic epic = new Epic(name, description, manager.getTaskId());
@@ -213,19 +225,19 @@ public class Main {
     }
 
     static void createNewSubtaskByEpic(int vybor) throws IOException, ManagerSaveException {
-        Duration duration = Duration.ofMinutes(20);
+        int duration = 20;
         LocalDateTime startTime = LocalDateTime.of(2022, 3, 4
                 , 10, 22, 25);
         System.out.println("Введите № Эпика ");
         SubTask subTask = new SubTask(name, description, status, manager.getTaskId()
                 , vybor, duration, startTime);
-        manager.inputNewSubTask(subTask, vybor);
+        manager.inputNewSubTask(subTask);
         System.out.println(manager.getDescriptionEpic());
         System.out.println("Создана подзадача для эпика № " + vybor);
     }
 
     static void deleteTaskById(int vybor) throws IOException, ManagerSaveException {
-        manager.deletTaskById(vybor);
+        manager.deleteTaskById(vybor);
         System.out.println("Удалена задача № " + vybor);
     }
 
@@ -256,4 +268,4 @@ public class Main {
         System.out.println("0 - Завершить работу приложения.");
     }
 }
-
+*/

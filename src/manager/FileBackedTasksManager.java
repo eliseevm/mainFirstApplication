@@ -5,23 +5,30 @@ import logic.SubTask;
 import logic.Task;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private File fileName;
+    private String url;
 
-    public FileBackedTasksManager(File fileName) {
-
-        this.fileName = fileName;
+    public FileBackedTasksManager (File fileName) {
+       this.fileName = fileName;
     }
 
-    private final HashMap<Integer, Task> tempDescriptionTask = getDescriptionTasks();
-    private final HashMap<Integer, SubTask> tempDescriptionSubTasks = getDescriptionSubTasks();
-    private final HashMap<Integer, Epic> tempDescriptionEpic = getDescriptionEpic();
+    public FileBackedTasksManager (String url) {
+        this.url = url;
+    }
     private List<Task> historyList;
-    
+
+
+
+    public List<Task> getHistoryList() {
+        return historyList;
+    }
 
     // Метод возвращает менеджер с восстановленными мз файла параметрами
     public static FileBackedTasksManager loadFromFile(File file) throws IOException
@@ -40,24 +47,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s",
                     "type", "name", "description", "status", "id"
                     , "duration", "startTime", "biEpic" + "\n"));
-            for (Integer keyTask : tempDescriptionTask.keySet()) {
-                String strTask = toString(tempDescriptionTask.get(keyTask)); // Таску в строку
+            for (Integer keyTask : getDescriptionTasks().keySet()) {
+                String strTask = toStrings(getDescriptionTasks().get(keyTask)); // Таску в строку
                 String typ = TaskEnum.TASK.toString(); // Преобразуем Енум типа Таски в строку
                 String str = String.join(",", typ, strTask + "\n"); // Сборка
                 // строки и добавление в нее поля "тип". Сборка строки через символ ;
                 writer.write(str); // Записываем в файл
             }
-            for (Integer keyEpic : tempDescriptionEpic.keySet()) {
-                String strEpic = toString(tempDescriptionEpic.get(keyEpic)); //  Таску в строку
+            for (Integer keyEpic : getDescriptionEpic().keySet()) {
+                String strEpic = toStrings(getDescriptionEpic().get(keyEpic)); //  Таску в строку
                 String typ = TaskEnum.EPIC.toString(); // Преобразуем Енум типа Таски в строку
                 String str = String.join(",", typ, strEpic + "\n"); // Собор строки
                 // и добавляем в нее поле "тип". Сборка строки через символ ;
                 writer.write(str); // Записываем в файл
             }
-            for (Integer keySubTask : tempDescriptionSubTasks.keySet()) {
-                String strSubTask = toString(tempDescriptionSubTasks.get(keySubTask));
+            for (Integer keySubTask : getDescriptionSubTasks().keySet()) {
+                String strSubTask = toStrings(getDescriptionSubTasks().get(keySubTask));
                 String typ = TaskEnum.SUBTASK.toString();
-                String epicId = String.valueOf(tempDescriptionSubTasks.get(keySubTask).getEpicId());
+                String epicId = String.valueOf(getDescriptionSubTasks().get(keySubTask).getEpicId());
                 String str = String.join(",", typ, strSubTask, epicId + "\n");
                 writer.write(str);
             }
@@ -73,21 +80,28 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             writer.write(str);
             writer.close(); // Закрываем поток
         } catch (IOException exception) { // Ловим исключение
-            throw new ManagerSaveException("Сообщение об исключении");
+            throw new ManagerSaveException("Поймано ручное исключение");
         }
     }
 
     // Метод преобразования задач в строку
-    private String toString(Task task) {
-        String name = task.getName();
-        String description = task.getDescription();
-        String status = task.getStatus().toString();
-        String id = String.valueOf(task.getId());
-        String duration = task.getDuration().toString();
-        String startTime = task.getStartTime().toString();
-        String str = String.join(",", name, description, status, id, duration, startTime);
+     String toStrings(Task task) {
+        String str = "";
+        try {
+            String name = task.getName();
+            String description = task.getDescription();
+            String status = task.getStatus().toString();
+            String id = String.valueOf(task.getId());
+            String duration = String.valueOf(task.getDuration());
+            String startTime = task.getStartTime().toString();
+            str = String.join(",", name, description, status, id, duration, startTime);
+        } catch (NullPointerException ex) {
+            System.out.println("При записи состояния менеджера пока не установлены параметры продолжительности и окончания эпика!");
+        }
+        System.out.println(str);
         return str;
     }
+
     public void startFromString() throws IOException, ManagerSaveException {
         fromString();
     }
@@ -129,20 +143,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     // Метод восстановления счетчика задач
     private void getMaxId() {
         int maxId = 0;
-        for (Integer key : tempDescriptionEpic.keySet()) {
-            int epicId = tempDescriptionEpic.get(key).getId();
+        for (Integer key : getDescriptionEpic().keySet()) {
+            int epicId = getDescriptionEpic().get(key).getId();
             if (epicId > maxId) {
                 maxId = epicId;
             }
         }
-        for (Integer key : tempDescriptionTask.keySet()) {
-            int taskId = tempDescriptionTask.get(key).getId();
+        for (Integer key : getDescriptionTasks().keySet()) {
+            int taskId = getDescriptionTasks().get(key).getId();
             if (taskId > maxId) {
                 maxId = taskId;
             }
         }
-        for (Integer key : tempDescriptionSubTasks.keySet()) {
-            int subTaskId = tempDescriptionSubTasks.get(key).getId();
+        for (Integer key : getDescriptionSubTasks().keySet()) {
+            int subTaskId = getDescriptionSubTasks().get(key).getId();
             if (subTaskId > maxId) {
                 maxId = subTaskId;
             }
@@ -151,26 +165,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // Метод восстановления задач
-    private void taskFromString(String[] split) throws ManagerSaveException {
+    protected void taskFromString(String[] split) throws ManagerSaveException {
 
         String name = split[1];
         String deskription = split[2];
         Status status = Status.valueOf(split[3]);
         Integer idTask = Integer.parseInt(split[4]);
-        Duration duration = Duration.parse(split[5]);
+        int duration = Integer.parseInt(split[5]);
         LocalDateTime startTime = LocalDateTime.parse(split[6]);
         Task restoredTask = new Task(name, deskription, status, idTask, duration, startTime);
-        tempDescriptionTask.put(idTask, restoredTask);
+        getDescriptionTasks().put(idTask, restoredTask);
     }
 
     // Метод восстановления подзадач
-    private void subTaskFromString(String[] split) throws ManagerSaveException {
+    protected void subTaskFromString(String[] split) throws ManagerSaveException {
         String name = split[1];
         String deskription = split[2];
         Status status = Status.valueOf(split[3]);
         Integer id = Integer.parseInt(split[4]);
         Integer epicId = Integer.parseInt(split[7]);
-        Duration duration = Duration.parse(split[5]);
+        int duration = Integer.parseInt(split[5]);
         LocalDateTime startTime = LocalDateTime.parse(split[6]);
         SubTask restoredSubTask = new SubTask(name, deskription, status, id, epicId
                 , duration, startTime);
@@ -180,37 +194,37 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // Метод восстановления эпика
-    private void epicFromString(String[] split) throws ManagerSaveException {
+    protected void epicFromString(String[] split) throws ManagerSaveException {
         String name = split[1];
         String deskription = split[2];
         Integer id = Integer.parseInt(split[4]);
         Epic restoredEpic = new Epic(name, deskription, id);
-        tempDescriptionEpic.put(id, restoredEpic);
+        getDescriptionEpic().put(id, restoredEpic);
     }
 
     // Метод восстановления истории задач
-    private void historyFromString(String[] split) {
+    protected void historyFromString(String[] split) {
         for (String tempId : split) {
             int id = Integer.parseInt(tempId);
-            for (Integer tempKey : tempDescriptionTask.keySet()) {
-                Task tempTask = tempDescriptionTask.get(tempKey);
+            for (Integer tempKey : getDescriptionTasks().keySet()) {
+                Task tempTask = getDescriptionTasks().get(tempKey);
                 int finalId = tempTask.getId();
                 if (finalId == id) {
-                    getHistoryManager().add(tempDescriptionTask.get(tempKey));
+                    getHistoryManager().add(getDescriptionTasks().get(tempKey));
                 }
             }
-            for (Integer tempTaskId : tempDescriptionSubTasks.keySet()) {
-                SubTask tempTask = tempDescriptionSubTasks.get(tempTaskId);
+            for (Integer tempTaskId : getDescriptionSubTasks().keySet()) {
+                SubTask tempTask = getDescriptionSubTasks().get(tempTaskId);
                 int finalId = tempTask.getId();
                 if (finalId == id) {
-                    getHistoryManager().add(tempDescriptionSubTasks.get(tempTaskId));
+                    getHistoryManager().add(getDescriptionSubTasks().get(tempTaskId));
                 }
             }
-            for (Integer tempTaskId : tempDescriptionEpic.keySet()) {
-                Epic tempTask = tempDescriptionEpic.get(tempTaskId);
+            for (Integer tempTaskId : getDescriptionEpic().keySet()) {
+                Epic tempTask = getDescriptionEpic().get(tempTaskId);
                 int finalId = tempTask.getId();
                 if (finalId == id) {
-                    getHistoryManager().add(tempDescriptionEpic.get(tempTaskId));
+                    getHistoryManager().add(getDescriptionEpic().get(tempTaskId));
                 }
             }
         }
@@ -227,7 +241,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     // Метод возвращает подзадачи по ID
     @Override
     public SubTask outputSubTaskById(int numberTask) throws ManagerSaveException {
-        getHistoryManager().add(getDescriptionSubTasks().get(numberTask));
+        // getHistoryManager().add(getDescriptionSubTasks().get(numberTask));
         save();
         return getDescriptionSubTasks().get(numberTask);
     }
@@ -242,14 +256,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод ввода новой задачи
     @Override
-    public void inputNewTask(Task task) throws ManagerSaveException {
+    public void inputNewTask(Task task) {
         sorted();
         if (!timeСontrol(task)) {
             return;
         } else {
             int id = task.getId();
             getDescriptionTasks().put(id, task);
-            save();
+           try {
+               save();
+               sorted();
+           } catch (ManagerSaveException ex) {
+               ex.getMessage();
+           }
         }
     }
 
@@ -268,23 +287,28 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     // Метод ввода новой подзадачи
     @Override
-    public void inputNewSubTask(SubTask subTask, int epicId) throws ManagerSaveException {
+    public void inputNewSubTask(SubTask subTask) {
         sorted();
         if (!timeСontrol(subTask)) {
             return;
         } else {
             int id = subTask.getId();
+            int epicId = subTask.getEpicId();
             Epic epic = getDescriptionEpic().get(epicId);
             epic.getListSubTask().add(subTask);
             getDescriptionSubTasks().put(id, subTask);
-            save();
-            sorted();
+           try {
+               save();
+               sorted();
+           } catch (ManagerSaveException ex) {
+               ex.getMessage();
+           }
         }
     }
 
     // Метод удаления задачи по номеру
     @Override
-    public void deletTaskById(int numberTask) throws ManagerSaveException {
+    public void deleteTaskById(int numberTask) {
         HashMap<Integer, InMemoryHistoryManager.Node<Task>> tMap
                 = getHistoryManager().getTempNodeMap();
         if (tMap.containsKey(numberTask)) {
@@ -300,15 +324,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 getDescriptionEpic().remove(numberTask);
             }
         }
-        save();
+        try {
+            save();
+        } catch (Exception ex) {
+            System.out.println("Исключение в методе удаления задачи пономеру");
+        }
+        sorted();
     }
 
     // Метод удаления задач всех типов
     @Override
-    public void deletAllTasks() throws ManagerSaveException {
+    public void deleteAllTasks() throws ManagerSaveException {
         getDescriptionEpic().clear();
         getDescriptionTasks().clear();
         getDescriptionSubTasks().clear();
+        getPrioritizedTasks().clear();
         save();
     }
 
@@ -319,28 +349,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         if (!super.equals(o)) return false;
         FileBackedTasksManager manager = (FileBackedTasksManager) o;
         return fileName.equals(manager.fileName)
-                && tempDescriptionTask.equals(manager.tempDescriptionTask)
-                && tempDescriptionSubTasks.equals(manager.tempDescriptionSubTasks)
-                && tempDescriptionEpic.equals(manager.tempDescriptionEpic)
+                && getDescriptionTasks().equals(manager.getDescriptionTasks())
+                && getDescriptionSubTasks().equals(manager.getDescriptionSubTasks())
+                && getDescriptionEpic().equals(manager.getDescriptionEpic())
                 && historyList.equals(manager.historyList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), fileName, tempDescriptionTask
-                , tempDescriptionSubTasks, tempDescriptionEpic, historyList);
+        return Objects.hash(super.hashCode(), fileName, getDescriptionTasks()
+                , getDescriptionSubTasks(), getDescriptionEpic(), historyList);
     }
 
-    @Override
-    public String toString() {
-        return "FileBackedTasksManager{" +
-                "fileName=" + fileName +
-                ", tempDescriptionTask=" + tempDescriptionTask +
-                ", tempDescriptionSubTasks=" + tempDescriptionSubTasks +
-                ", tempDescriptionEpic=" + tempDescriptionEpic +
-                ", historyList=" + historyList +
-                '}';
-    }
 }
 
 
