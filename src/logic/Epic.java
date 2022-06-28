@@ -5,37 +5,30 @@ import manager.Status;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Objects;
 
 public class Epic extends Task {
 
     private ArrayList<SubTask> listSubTask;
-    //private Duration duration;
-    //private LocalDateTime endTime;
-    //private LocalDateTime startTime = LocalDateTime.now();
 
     public Epic(String name, String description, int id) {
         super(name, description, id);
-        listSubTask = new ArrayList<>();
-        duration = getDuration();
-       //endTime = getEndTime();
-
+        listSubTask = new ArrayList<>(); // Список подзадач.
+        duration = createDuration(); // Продолжительность Эпика в завизимости от кол-ва подзадач.
+        startTime = createStartTime(); // Время начала выполнения эпика в завизимости от подзадач.
+        endTime = createEndTime(); // Время окончания выполнения эпика в завизимости от подзадач.
     }
 
+    // Метод возвращает список подзадач.
     public ArrayList<SubTask> getListSubTask() {
-        ArrayList<SubTask>list = null;
-        if (listSubTask==null) {
-            System.out.println("У этого эпика пока нет списка задач!");
-        } else if (listSubTask != null) {
-            list = listSubTask;
-        } return list;
+        return listSubTask;
     }
 
-    // Метод актуализации статуса эпика в зависимости от состояния статуса подзадач
-    @Override
-    public Status getStatus() {
-        status = Status.NEW;
-        if (!(listSubTask.isEmpty())) {
+    // Метод устанавливает статус эпика в зависимости от состояния статуса подзадач в списвке.
+    public Status createStatus() {
+        Status stat = Status.NEW;
+        if (!this.getListSubTask().isEmpty()) {
             int j = 0;
             int s = 0;
             for (int i = 0; i < listSubTask.size(); i++) {
@@ -47,50 +40,53 @@ public class Epic extends Task {
                 }
             }
             if (j == listSubTask.size()) {
-                status = Status.DONE;
+                stat = Status.DONE;
             } else if (s == listSubTask.size()) {
-                status = Status.NEW;
+                stat = Status.NEW;
             } else {
-                status = Status.IN_PROGRESS;
+                stat = Status.IN_PROGRESS;
             }
-        } else {
-            status = Status.NEW;
+        } else if (getListSubTask().isEmpty()) {
+            stat = Status.NEW;
         }
-        return status;
+        return stat;
     }
 
-    // Метод устанавливает продолжительность эпика в зависимости от saubtask, возвращает новую
-    // продолжительность эпика
-    @Override
-    public int getDuration() {
+    // Метод устанавливает продолжительность эпика в зависимости от listSubTask.
+    public int createDuration() {
+        int duration = 0;
         ArrayList<SubTask> temp = getListSubTask();
-        for (SubTask subTask : temp) {
-            int durationST = subTask.getDuration();
-            duration = duration + durationST;
+        if (!temp.isEmpty()) {
+            for (SubTask subTask : temp) {
+                int durationST = subTask.getDuration();
+                duration = duration + durationST;
+            }
         }
         return duration;
     }
 
-    public LocalDateTime getEndTime() {
-        if (listSubTask.size() != 0) {
-            int i = (listSubTask.size()) - 1;
-            SubTask temp = listSubTask.get(i);
-            LocalDateTime endTimeSt = temp.getEndTime();
-            if (endTimeSt.isAfter(endTime)) {
-                this.endTime = endTimeSt;
-
+    // Метод устанавливает время окончания выполнения эпика в зависимости от listSubTask.
+    @Override
+    public LocalDateTime createEndTime() {
+        LocalDateTime endTime = LocalDateTime.now();
+        if (!listSubTask.isEmpty()) {
+            for (int i = 0; i < listSubTask.size(); i++) {
+                SubTask temp = listSubTask.get(i);
+                LocalDateTime sT = temp.getEndTime();
+                endTime = listSubTask.get(0).getEndTime();
+                if (sT.isAfter(endTime)) {
+                    endTime = sT;
+                }
             }
             return endTime;
-        } else if (listSubTask.size() == 0) {
-            System.out.println("У Эпика пока нет подзадач, время окончания  не определено!");
         }
         return endTime;
     }
 
-    // Метод возвращает время начала Эпика
-    @Override
-    public LocalDateTime getStartTime() {
-        if (listSubTask != null) {
+    // Метод устанавливает время начала выполнения эпика в зависимости от listSubTask.
+    public LocalDateTime createStartTime() {
+        LocalDateTime startTime = LocalDateTime.now();
+        if (!listSubTask.isEmpty()) {
             for (int i = 0; i < listSubTask.size(); i++) {
                 SubTask temp = listSubTask.get(i);
                 LocalDateTime sT = temp.getStartTime();
@@ -101,7 +97,6 @@ public class Epic extends Task {
             }
             return startTime;
         }
-        System.out.println("У Эпика пока нет подзадач, время начала не определено!");
         return startTime;
     }
 
@@ -123,7 +118,10 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "listSubTask=" + listSubTask +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
                 ", status=" + status +
+                ", id=" + id +
                 ", duration=" + duration +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +

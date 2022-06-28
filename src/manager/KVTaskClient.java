@@ -10,13 +10,12 @@ import java.net.http.HttpResponse;
 
 public class KVTaskClient {
     private String url;
-    private URI uri; // Строка с адресом ресурса
-    private String API_TOKEN; // Ключ авторизации
+    private URI uri; // Строка с адресом ресурса.
+    private String API_TOKEN; // Ключ авторизации.
     private HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
-    // обработчик
-    Gson gson = new Gson(); // Создаём экземпляр gson
-    HttpClient client;
+    private HttpClient client;
 
+    // В конструкторе производится авторизация на сервере хранения и получение ключа.
     public KVTaskClient(String url) {
         client = HttpClient.newHttpClient();
         this.url = url;
@@ -34,6 +33,7 @@ public class KVTaskClient {
         }
     }
 
+    // Метод для загрузеи данных о состоянии HttpTaskManager на сервере-хранилише.
     public void put(String key, String json) {
         try {
             uri = URI.create("http://localhost:8078/save/" + key + "?API_TOKEN=DEBUG");
@@ -52,21 +52,23 @@ public class KVTaskClient {
         }
     }
 
-    String load(String key) {
-        uri = URI.create(url + key + "?API_TOKEN=DEBUG");
-        String body = null;
+
+    // Метод выгрузки данных из хранилиша для восстановления состояния менеджера.
+    HttpResponse<String> load(String key) {
+        HttpClient client = HttpClient.newHttpClient();
+        uri = URI.create("http://localhost:8078/load/" + key + "?API_TOKEN=DEBUG");
+        HttpResponse<String> response = null;
         try {
             HttpRequest.Builder rb = HttpRequest.newBuilder();
             HttpRequest request = rb
                     .GET()
                     .uri(uri)
                     .build();
-            HttpResponse<String> response = client.send(request, handler);
-            body = response.body();
-            System.out.println(body);
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
         } catch (IOException | InterruptedException ex) {
             System.out.println(ex.getMessage());
         }
-        return body;
+        return response;
     }
 }

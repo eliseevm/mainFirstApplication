@@ -3,14 +3,13 @@ package Test;
 import logic.Epic;
 import logic.SubTask;
 import logic.Task;
-import manager.ManagerSaveException;
+import service.ManagerSaveException;
 import manager.Status;
 import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,7 +41,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @BeforeEach
     void volumeForTests() throws IOException, ManagerSaveException {
-
         taskManager.inputNewTask(new Task("name", "description", Status.NEW
                 , 0, durationTask, startTimeTask));
         taskManager.inputNewEpic(new Epic("name", "description", 1));

@@ -7,18 +7,18 @@ import java.util.*;
 public class InMemoryHistoryManager implements HistoryManager {
 
     private HashMap<Integer, Node<Task>> tempNodeMap = new HashMap<>(); /* Вспомогательная таблица
-    для извлечения из двусвязного списка */
-    private LinkedList<Node<Task>> test = new LinkedList<>(); // Двусвязный список
-    private Node<Task> head; // Голова двусвязного списка
-    private Node<Task> tail; // Хвост двусвязного списка
+    для извлечения из двусвязного списка. */
+    private LinkedList<Node<Task>> test = new LinkedList<>(); // Двусвязный список.
+    private Node<Task> head; // Голова двусвязного списка.
+    private Node<Task> tail; // Хвост двусвязного списка.
 
-    // Метод возвращает вспомогательную таблицу для учета просмотренных задач
+    // Метод возвращает вспомогательную таблицу для учета просмотренных задач.
     public HashMap<Integer, Node<Task>> getTempNodeMap() {
         return tempNodeMap;
     }
 
     /* Метод добавляет новый элемент и удаляет старый двойник элемента из всех коллекций хранящих
-        историю просмотра задач */
+        историю просмотра задач. */
     @Override
     public void add(Task task) {
             int taskId = task.getId();
@@ -36,19 +36,19 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    // Метод удаления объекта из вспомогательного списка истории просмотра
+    // Метод удаления объекта из вспомогательного списка истории просмотра.
     @Override
     public void remove(int id) {
         tempNodeMap.remove(id);
     }
 
-    // Метод возвращает перечень просмотренных задач
+    // Метод возвращает перечень просмотренных задач.
     @Override
     public List<Task> getHistory() {
         return getTasks();
     }
 
-    // Класс реализации объектов для двусвязного списка
+    // Класс реализации объектов для двусвязного списка.
     public class Node<T> {
 
         public T data;
@@ -62,7 +62,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    // Метод добавления узла в конец двусвязного списока
+    // Метод добавления узла в конец двусвязного списка.
     public void linkLast(Task element) {
         final Node<Task> oldTail = this.tail;
         final Node<Task> newNode = new Node<>(null, element, oldTail);
@@ -73,7 +73,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             oldTail.next = newNode;
     }
 
-    // Метод получения всех узлов из двусвязного списка
+    // Метод получения всех узлов из двусвязного списка.
     public List<Task> getTasks() {
         List<Task> taskList = new ArrayList<>();
         Node<Task> element = this.head;
@@ -84,7 +84,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         return taskList;
     }
 
-    // Метод удаления узла из двусвязного списка
+    // Метод удаления узла из двусвязного списка.
     public void removeNode(Node<Task> element) {
         final Node<Task> next = element.next;
         final Node<Task> prev = element.prev;

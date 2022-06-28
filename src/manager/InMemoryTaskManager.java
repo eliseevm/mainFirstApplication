@@ -3,12 +3,14 @@ package manager;
 import logic.Epic;
 import logic.SubTask;
 import logic.Task;
+import service.ManagerSaveException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
+
 
     Comparator<Object> comparator = new Comparator<Object>() {
         @Override
@@ -22,59 +24,58 @@ public class InMemoryTaskManager implements TaskManager {
             return w;
         }
     };
-    private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач
-    private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач
-    private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков
-    private InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager(); // Создаем
-    private Set<Task> generalList = new TreeSet<Task>(comparator); // Список в который перекладываем объекты
+    private HashMap<Integer, Task> descriptionTasks = new HashMap<>(); // Перечень задач/
+    private HashMap<Integer, SubTask> descriptionSubTasks = new HashMap<>(); // Перечень подзадач/
+    private HashMap<Integer, Epic> descriptionEpic = new HashMap<>(); // Перечень эпиков/
+    private InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
+    private Set<Task> generalList = new TreeSet<Task>(comparator); // Множество для сортировки задач.
     private HashMap<Integer, Object> generalMap = new HashMap<>(); /* Таблица для объединения задач
-    вскх типов в одгу коллекцию из generalMap для сортировки в Collection */
+    вскх типов в одну коллекцию для сортировки в Collection */
 
     private int taskId = 0; // Счетчик задач
-    private int k = 0;
+    //private int k = 0;
 
-    // Метод возвращает перечень задач
+    // Метод возвращает перечень задач.
     @Override
     public HashMap<Integer, Task> getDescriptionTasks() {
         return descriptionTasks;
     }
 
-    // Метод возвращает перечень подзадач
+    // Метод возвращает перечень подзадач.
     @Override
     public HashMap<Integer, SubTask> getDescriptionSubTasks() {
         return descriptionSubTasks;
     }
 
-    // Метод возвращает перечень эпиков
+    // Метод возвращает перечень эпиков.
     @Override
     public HashMap<Integer, Epic> getDescriptionEpic() {
         return descriptionEpic;
     }
 
-    //  Метод возвращает объект с историей просмотра задач
+    //  Метод возвращает объект с историей просмотра задач.
     public InMemoryHistoryManager getHistoryManager() {
         return inMemoryHistoryManager;
     }
 
-    // Метод получения номера для задачи
+    // Метод получения номера для задачи.
     @Override
     public int getTaskId() {
         return taskId++;
     }
 
-    // Метод возвращает List - список истории просмотра, прлученный из двусвязного списка
+    // Метод возвращает List - список истории просмотра, прлученный из двусвязного списка.
     @Override
     public List<Task> getHistory() throws IOException {
         return inMemoryHistoryManager.getHistory();
     }
 
-    // Метод возвращает саисок отсортированный по дате начала
+    // Метод возвращает список задач, отсортированный по дате начала задач.
     public Set<Task> getPrioritizedTasks() {
         return generalList;
     }
 
-
-    // Метод сортирует задачи всех типов и вызывает метод печати отсортированного списка
+    // Метод сортирует задачи всех типов и возврашает их в виде множества.
     public Set<Task> sorted() {
         generalMap.clear();
         generalList.clear();
@@ -87,24 +88,24 @@ public class InMemoryTaskManager implements TaskManager {
         return generalList;
     }
 
-    // Метод сохраняет новый id (восстанавливает максимальный id из файла)
+    // Метод сохраняет новый id (восстанавливает максимальный id из файла).
     public void setTaskId(int taskId) {
         this.taskId = taskId;
     }
 
-    // Метод возвращает все задачи
+    // Метод возвращает все задачи.
     @Override
     public HashMap<Integer, Task> outputAllTask() {
         return descriptionTasks;
     }
 
-    // Метод возвращает все эпики
+    // Метод возвращает все эпики.
     @Override
     public HashMap<Integer, Epic> outputAllEpics() {
         return descriptionEpic;
     }
 
-    // Метод возвращает подзадачи по эпику
+    // Метод возвращает подзадачи по эпику.
     @Override
     public ArrayList<SubTask> outputSubtaskByEpik(int epicId) {
         Epic epic = null;
@@ -115,7 +116,7 @@ public class InMemoryTaskManager implements TaskManager {
     } return epic.getListSubTask();
     }
 
-    // Метод возвращает задачи по ID
+    // Метод возвращает задачи по ID.
     @Override
     public Task outputTaskById(int numberTask) throws IOException, ManagerSaveException {
         Task task = null;
@@ -132,7 +133,7 @@ public class InMemoryTaskManager implements TaskManager {
         return task;
     }
 
-    // Метод возвращает подзадачи по ID
+    // Метод возвращает подзадачи по ID.
     @Override
     public SubTask outputSubTaskById(int numberTask) throws IOException, ManagerSaveException {
         try {
@@ -143,7 +144,7 @@ public class InMemoryTaskManager implements TaskManager {
         return descriptionSubTasks.get(numberTask);
     }
 
-    // Метод возвращает эпик по ID
+    // Метод возвращает эпик по ID.
     @Override
     public Epic outputEpicById(int numberTask) throws IOException, ManagerSaveException {
        try {
@@ -154,7 +155,7 @@ public class InMemoryTaskManager implements TaskManager {
         return descriptionEpic.get(numberTask);
     }
 
-    // Метод ввода новой задачи
+    // Метод ввода новой задачи.
     @Override
     public void inputNewTask(Task task) {
         sorted();
@@ -167,7 +168,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    // Метод ввода нового эпика
+    // Метод ввода нового эпика.
     @Override
     public void inputNewEpic(Epic epic) throws IOException, ManagerSaveException {
         sorted();
@@ -176,13 +177,14 @@ public class InMemoryTaskManager implements TaskManager {
            return;
         } else {
             int id = epic.getId();
+            epic.setStatus(epic.createStatus());
             descriptionEpic.put(id, epic);
         }
     }
 
-    // Метод ввода новой подзадачи
+    // Метод ввода новой подзадачи.
     @Override
-    public void inputNewSubTask(SubTask subTask) {
+    public void inputNewSubTask(SubTask subTask) throws ManagerSaveException {
         sorted();
         boolean r = timeСontrol(subTask);
         if (r = false) {
@@ -191,15 +193,17 @@ public class InMemoryTaskManager implements TaskManager {
             try {
                 int id = subTask.getId();
                 int epicId = subTask.getEpicId();
-                Epic epic = descriptionEpic.get(epicId);
+                Epic epic = getDescriptionEpic().get(epicId);
                 epic.getListSubTask().add(subTask);
-                descriptionSubTasks.put(id, subTask);
-                Epic control = epic;
-                descriptionEpic.put(epicId, control);
+                getDescriptionSubTasks().put(id, subTask);
+                epic.setStatus(epic.createStatus());
+                epic.setDuration(epic.createDuration());
+                epic.setStartTime(epic.createStartTime());
+                epic.setEndTime(epic.createEndTime());
             } catch (NullPointerException ex) {
                 System.out.println("Для выбранного id задачи не создано, введите другой id!");
             }
-       }
+        }
         sorted();
     }
 
@@ -235,7 +239,7 @@ public class InMemoryTaskManager implements TaskManager {
         descriptionEpic.put(id, epic);
     }
 
-    // Метод удаления задачи по номеру
+    // Метод удаления задачи по номеру.
     @Override
     public void deleteTaskById(int numberTask) {
             if (descriptionTasks.containsKey(numberTask)) {
@@ -246,9 +250,7 @@ public class InMemoryTaskManager implements TaskManager {
             sorted();
         }
 
-
-
-    // Метод удаления задач всех типов
+    // Метод удаления задач всех типов.
     @Override
     public void deleteAllTasks() throws ManagerSaveException {
         descriptionEpic.clear();
@@ -258,7 +260,7 @@ public class InMemoryTaskManager implements TaskManager {
         sorted();
     }
 
-    // Метод проверки всех задач на пересечение по duration
+    // Метод проверки всех задач на пересечение по интервалам выполнения.
     public boolean timeСontrol(Task task) {
         int r = 0; // Счетчик пересечений
         LocalDateTime start = task.getStartTime();
@@ -274,7 +276,7 @@ public class InMemoryTaskManager implements TaskManager {
                         r = r + 1;
                     }
                 } catch (NullPointerException ex) {
-                    System.out.println("Подзадача не создана, время определится позже!");
+                    System.out.println("Подзадача не создана, для неё не создали Эпик!");
                 }
             }
         }

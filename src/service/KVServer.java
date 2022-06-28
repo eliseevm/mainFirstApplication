@@ -1,4 +1,4 @@
-package manager;
+package service;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -8,7 +8,6 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -20,7 +19,8 @@ public class KVServer {
 
     public KVServer() throws IOException {
         apiToken = generateApiToken();
-        server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
+        server = HttpServer.create(); //(new InetSocketAddress("localhost", PORT), 0);
+        server.bind(new InetSocketAddress(PORT), 0);
         server.createContext("/register", this::register);
         server.createContext("/save", this::save);
         server.createContext("/load", this::load);
@@ -29,6 +29,7 @@ public class KVServer {
     public static String getServerURL() {
         return "http://localhost:" + PORT;
     }
+
 
     private void load(HttpExchange h) throws IOException {
         try {
@@ -48,7 +49,7 @@ public class KVServer {
                     return;
                 }
                 String response = data.get(key);
-                System.out.println("Значение для ключа " + key + " успешно Восстановлено!");
+                System.out.println("Значение для ключа " + key + " успешно Восстановлено c KvServer!");
                 h.sendResponseHeaders(200, 0);
                 try (OutputStream os = h.getResponseBody()) {
                     os.write(response.getBytes());
@@ -87,7 +88,7 @@ public class KVServer {
                     return;
                 }
                 data.put(key, value);
-                System.out.println("Значение для ключа " + key + " успешно обновлено!");
+                System.out.println("Значение для ключа " + key + " успешно обновлено на kvServer!");
                 h.sendResponseHeaders(200, 0);
             } else {
                 System.out.println("/save ждёт POST-запрос, а получил: " + h.getRequestMethod());

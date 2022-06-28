@@ -8,14 +8,14 @@ import java.util.Objects;
 
 public class SubTask extends Task {
 
-    private int epicId;
+    private int epicId; // Идентификатор эпика для привязки подзадачи к эпику.
 
+    // Конструктор для подзадач.
     public SubTask(String name, String description, Status status, int id, int epicId
             , int duration, LocalDateTime startTime) {
         super(name, description, status, id, duration, startTime);
         this.epicId = epicId;
     }
-
 
     public int getEpicId() {
         return epicId;

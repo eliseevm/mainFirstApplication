@@ -9,29 +9,37 @@ import java.util.Objects;
 
 public class Task {
 
-    private String name;
-    private String description;
-    Status status;
-    private int id;
-     int duration;
-     LocalDateTime startTime;
-     LocalDateTime endTime;
+    protected String name; // Название задачи.
+    protected String description; // Описание задачи.
+    protected Status status; // Статус задачи.
+    protected int id; // Идентификатор задачи.
+    protected int duration; // Продолжительность выполнения задачи
+    protected LocalDateTime startTime; // Время начала выполнения задачи.
+    protected LocalDateTime endTime; // Время окончания выполнения задачи.
 
+    // Конструктор для задач и подзадач.
     public Task(String name, String description, Status status, int id, int duration
             , LocalDateTime startTime) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.id = id;
-        this.startTime = startTime;
         this.duration = duration;
-        this.endTime = getEndTime();
+        this.startTime = startTime;
+        this.endTime = createEndTime();
     }
 
+    // Конструктор для эпиков.
     public Task(String name, String description, int id) {
         this.name = name;
         this.description = description;
         this.id = id;
+    }
+
+    // Метод для расчета времени окончания выполнения задач и подзадач.
+    public LocalDateTime createEndTime() {
+        endTime = startTime.plusMinutes(getDuration());
+        return endTime;
     }
 
     public String getName() {
@@ -59,7 +67,6 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        this.endTime = startTime.plusMinutes(this.getDuration());
         return endTime;
     }
 
@@ -71,12 +78,30 @@ public class Task {
         this.description = description;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && duration == task.duration && name.equals(task.name) && description.equals(task.description) && status == task.status && startTime.equals(task.startTime) && endTime.equals(task.endTime);
+        return id == task.id && duration == task.duration && name.equals(task.name)
+                && description.equals(task.description) && status == task.status
+                && startTime.equals(task.startTime) && endTime.equals(task.endTime);
     }
 
     @Override

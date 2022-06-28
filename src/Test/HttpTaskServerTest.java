@@ -3,302 +3,423 @@ package Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import logic.Epic;
 import logic.SubTask;
 import logic.Task;
 import manager.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import service.HttpTaskServer;
+import service.KVServer;
+import service.ManagerSaveException;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpTaskServerTest {
-    TaskManager httpTaskManager;
-    HttpTaskServer httpTaskServer;
-    HttpTaskClient client;
+    Task task;
+    Epic epic;
+    SubTask subTask;
+    TaskManager manager = Managers.getDefault();
+    HttpTaskServer server;
+    KVServer kvServer;
+    HttpResponse<String> response;
+    HttpRequest.Builder rB;
     GsonBuilder gsonBuilder;
     Gson gson;
+    HttpClient client;
+    HttpResponse.BodyHandler<String> handler;
 
-    /*public HttpTaskServerTest() throws IOException {
-        super(new HttpTaskManager("http://localhost:8078"));
-        httpTaskManager = Managers.getDefault();
-        httpTaskServer = new HttpTaskServer(httpTaskManager);
-        client = new HttpTaskClient("http://localhost:8080/tasks");
+    public HttpTaskServerTest() throws IOException, ManagerSaveException {
+        created();
+        history();
+        server = new HttpTaskServer(manager);
+        kvServer = new KVServer();
+        rB = HttpRequest.newBuilder();
+        client = HttpClient.newHttpClient();
+        handler = HttpResponse.BodyHandlers.ofString();
         gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter1());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
         gsonBuilder.setPrettyPrinting();
         gson = gsonBuilder.create();
-    }*/
-
-    @BeforeEach
-    void begin() throws IOException {
-      httpTaskManager = new HttpTaskManager("http://localhost:8078");
-        httpTaskServer = new HttpTaskServer(httpTaskManager);
-        client = new HttpTaskClient("http://localhost:8080/tasks");
-        gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter1());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gsonBuilder.setPrettyPrinting();
-        gson = gsonBuilder.create();
-        httpTaskServer.start();
-
+        server.start();
+        kvServer.start();
     }
 
-   /* @AfterAll
-    void finish() {
-        httpTaskServer.stop();
-    }*/
+    public void created() throws IOException, ManagerSaveException {
+        int durationTask = 15;
+        LocalDateTime startTimeTask = LocalDateTime.of(2022, 6
+                , 23, 10, 22, 25);
+        LocalDateTime startTimeTask1 = LocalDateTime.of(2022, 7
+                , 3, 10, 22, 23);
+        LocalDateTime startTimeTask2 = LocalDateTime.of(2022, 8
+                , 3, 10, 22, 23);
+        LocalDateTime startTimeTask3 = LocalDateTime.of(2022, 8
+                , 7, 10, 20, 20);
+        LocalDateTime startTimeTask4 = LocalDateTime.of(2022, 8
+                , 3, 11, 22, 23);
+        LocalDateTime startTimeTask5 = LocalDateTime.of(2022, 8
+                , 7, 15, 20, 20);
+
+        task = new Task("name", "description"
+                , Status.NEW, 0, durationTask, startTimeTask4);
+        epic = new Epic("Epicname", "Epicdescription", 7);
+        subTask = new SubTask("STname", "STdescription", Status.DONE
+                , 8, 3, durationTask, startTimeTask5);
+
+        manager.inputNewEpic(new Epic("Epicname", "Epicdescription", 0));
+        manager.inputNewTask(new Task("name", "description"
+                , Status.NEW, 1, durationTask, startTimeTask));
+        manager.inputNewTask(new Task("name", "description"
+                , Status.IN_PROGRESS, 2, durationTask, startTimeTask1));
+        manager.inputNewEpic(new Epic("Epicname", "Epicdescription", 3));
+        manager.inputNewSubTask(new SubTask("STname", "STdescription", Status.DONE
+                , 4, 3, durationTask, startTimeTask2));
+        manager.inputNewSubTask(new SubTask("STname", "STdescription", Status.NEW
+                , 5, 3, durationTask, startTimeTask3));
+    }
+
+    void history() {
+        try {
+            manager.outputSubTaskById(4);
+            manager.outputTaskById(1);
+            manager.outputEpicById(3);
+        } catch (IOException | ManagerSaveException ex) {
+            ex.getMessage();
+            System.out.println("Непредвиденная ошибка в мэйне");
+        }
+    }
+
+    @AfterEach
+    void serverStop() {
+        server.stop();
+        kvServer.stop();
+    }
+
     @Test
-    void testInputNewTask() throws IOException, ManagerSaveException {
-       Task task = new Task("HTTPTest", "HTTPDescription", Status.DONE
-                , 7, 10, LocalDateTime.parse("2022.06.25 15.22.25"));
+    void testInputTask() {
         String json = gson.toJson(task);
-        client.put("/task?id=7", json);
-        System.out.println(json);
-        String respJson = client.load("/task?id=7");
-        System.out.println(respJson);
-        assertEquals(json, respJson);
-    }
-
-   /* @Test
-    void testInputNewEpic() throws IOException, ManagerSaveException {
-        assertEquals(2, taskManager.getDescriptionEpic().size());
-        taskManager.inputNewEpic(new Epic("name", "description", 8));
-        assertEquals(3, taskManager.getDescriptionEpic().size());
-    }
-
-    @Test
-    void testInputNewSubTask() throws IOException, ManagerSaveException {
-        assertEquals(2, taskManager.getDescriptionSubTasks().size());
-        taskManager.inputNewSubTask(new SubTask("name", "description", Status.IN_PROGRESS
-                , 9, 1, durationSubTask, startTimeSubTask2));
-        assertEquals(3, taskManager.getDescriptionSubTasks().size());
-    }
-
-    @Test
-    void testGetDescriptionTasks() throws IOException, ManagerSaveException {
-
-        assertEquals(3, taskManager.getDescriptionTasks().size());
-        taskManager.deleteAllTasks();
-        assertEquals(0, taskManager.getDescriptionTasks().size());
-    }
-
-    @Test
-    void testGetDescriptionSubTasks() throws IOException, ManagerSaveException {
-        assertEquals(2, taskManager.getDescriptionSubTasks().size());
-        taskManager.deleteAllTasks();
-        assertEquals(0, taskManager.getDescriptionSubTasks().size());
-    }
-
-    @Test
-    void testGetDescriptionEpic() throws IOException, ManagerSaveException {
-        assertEquals(2, taskManager.getDescriptionEpic().size());
-        taskManager.deleteAllTasks();
-        assertEquals(0, taskManager.getDescriptionEpic().size());
-    }
-
-    @Test
-    void testGetTaskId() {
-        assertEquals(0, taskManager.getTaskId());
-    }
-
-    @Test
-    void testGetHistory() throws IOException, ManagerSaveException {
-        assertEquals(1, taskManager.getHistory().get(2).getId());
-        taskManager.deleteAllTasks();
-        assertEquals(5, taskManager.getHistory().get(1).getId());
-        assertEquals(7, taskManager.getHistory().size());
-    }
-
-    @Test
-    void testOutputAllTask() throws IOException, ManagerSaveException {
-        assertEquals(3, taskManager.outputAllTask().size());
-        taskManager.deleteAllTasks();
-        assertEquals(0, taskManager.outputAllTask().size());
-        taskManager.inputNewTask(new Task("name", "description", Status.DONE
-                , 0, durationTask, startTimeTask1));
-        assertEquals(1, taskManager.outputAllTask().size());
-    }
-
-    @Test
-    void testOutputAllEpics() throws IOException, ManagerSaveException {
-        assertEquals(2, taskManager.outputAllEpics().size());
-        taskManager.deleteTaskById(2);
-        assertEquals(1, taskManager.getDescriptionEpic().size());
-    }
-
-    @Test
-    void testOutputSubtaskByEpik() throws IOException, ManagerSaveException {
-        assertEquals(2, taskManager.outputSubtaskByEpik(1).size());
-        assertEquals(Status.NEW, taskManager.outputSubtaskByEpik(1).get(0).getStatus());
-    }
-
-    @Test
-    void testOutputTaskById() throws IOException, ManagerSaveException {
-        assertEquals(5, taskManager.outputTaskById(5).getId());
-        assertEquals(Status.DONE, taskManager.outputTaskById(5).getStatus());
-    }
-
-    @Test
-    void testOutputSubTaskById() throws IOException, ManagerSaveException {
-        assertEquals(3, taskManager.outputSubTaskById(3).getId());
-        assertEquals(Status.NEW, taskManager.outputSubTaskById(3).getStatus());
-    }
-
-    @Test
-    void testOutputEpicById() throws IOException, ManagerSaveException {
-        assertEquals(2, taskManager.outputEpicById(2).getId());
-        assertEquals(Status.IN_PROGRESS, taskManager.outputEpicById(1).getStatus());
-    }
-
-    @Test
-    void testUpdateTask() {
-        assertEquals(Status.NEW, taskManager.getDescriptionTasks().get(6).getStatus());
-        assertEquals(3, taskManager.getDescriptionTasks().size());
-        taskManager.updateTask(new Task("name", "description", Status.IN_PROGRESS
-                , 6, durationTask, startTimeTask3));
-        assertEquals(3, taskManager.getDescriptionTasks().size());
-        assertEquals(Status.IN_PROGRESS, taskManager.getDescriptionTasks().get(6).getStatus());
-    }
-
-    @Test
-    void testUpdateSubTask() {
-        taskManager.updateSubTask(new SubTask("Обновленная", "description", Status.NEW
-                , 3, 1, durationSubTask, startTimeSubTask));
-        ;
-        assertEquals(2, taskManager.getDescriptionSubTasks().size());
-        assertEquals("Обновленная", taskManager.getDescriptionSubTasks().get(3).getName());
-    }
-
-    @Test
-    void testUpdateEpic() {
-        taskManager.updateEpic(new Epic("Обновленный", "description", 1));
-        assertEquals(2, taskManager.getDescriptionEpic().size());
-        assertEquals("Обновленный", taskManager.getDescriptionEpic().get(1).getName());
-    }
-
-    @Test
-    void testDeletTaskById() throws IOException, ManagerSaveException {
-        taskManager.deleteTaskById(0);
-        assertEquals(2, taskManager.getDescriptionTasks().size());
-        assertNull(taskManager.getDescriptionTasks().get(0));
-    }
-
-    @Test
-    void testDeletAllTasks() throws IOException, ManagerSaveException {
-        taskManager.deleteAllTasks();
-        assertNull(taskManager.getDescriptionEpic().get(1));
-        assertNull(taskManager.getDescriptionTasks().get(0));
-        assertNull(taskManager.getDescriptionSubTasks().get(3));
-    }*/
-
-    class HttpTaskClient {
-        HttpClient client;
-        String url;
-        URI uri;
-        private HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
-
-        public HttpTaskClient(String url) {
-            client = HttpClient.newHttpClient();
-            this.url = url; // Устанавливаем значение адреса ресурса через конструктор при создании клиента
-        }
-
-        public void put(String key, String json) {
-            try {
-                uri = URI.create("http://localhost:8080/tasks/" + key);
-                HttpRequest.Builder rb = HttpRequest.newBuilder(); // Получаем экземпляр класса строителя
-                HttpRequest request = rb // создаем объект описывающий запрос
-                        .uri(uri)
-                        .version(HttpClient.Version.HTTP_1_1)
-                        .header("Accept", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(json))
-                        .build();
-                HttpResponse<String> response = client.send(request, handler);
-                System.out.println("Код добавления/обновления по ключу " + key + " " + response.statusCode());
-            } catch (IOException | InterruptedException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-
-        String load(String key) {
-            uri = URI.create(url + key);
-            String body = null;
-            try {
-                HttpRequest.Builder rb = HttpRequest.newBuilder();
-                HttpRequest request = rb
-                        .GET()
-                        .uri(uri)
-                        .version(HttpClient.Version.HTTP_1_1)
-                        .header("Accept", "application/json")
-                        .build();
-                HttpResponse<String> response = client.send(request, handler);
-                body = response.body();
-                System.out.println(body);
-            } catch (IOException | InterruptedException ex) {
-                System.out.println(ex.getMessage());
-            }
-            return body;
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/task");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .version((HttpClient.Version.HTTP_1_1))
+                    .header("Accept", "application/json")
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode(), "Задача не добавлена");
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testInputTask ");
         }
     }
 
-    class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
+    @Test
+    void testInputEpic() {
+        String json = gson.toJson(epic);
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/epic");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .version((HttpClient.Version.HTTP_1_1))
+                    .header("Accept", "application/json")
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode(), "Задача не добавлена");
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testInputEpic ");
+        }
+    }
+
+    @Test
+    void testInputSubTask() {
+        String json = gson.toJson(subTask);
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/subtask");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .version((HttpClient.Version.HTTP_1_1))
+                    .header("Accept", "application/json")
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode(), "Задача не добавлена");
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testInputSubTask ");
+        }
+    }
+
+    @Test
+    void testGetTask() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/task?id=1");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            Task task = gson.fromJson(response.body(), Task.class);
+            int id = task.getId();
+            assertEquals(1, id);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testGetTask ");
+        }
+    }
+
+    @Test
+    void testGetEpic() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/epic?id=3");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            Epic epic = gson.fromJson(response.body(), Epic.class);
+            int id = epic.getId();
+            assertEquals(3, id);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testGetEpic ");
+        }
+    }
+
+    @Test
+    void testGetSubTask() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/subtask?id=4");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            SubTask subTask = gson.fromJson(response.body(), SubTask.class);
+            int id = subTask.getId();
+            assertEquals(4, id);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testGetSubTask ");
+        }
+    }
+
+    @Test
+    void testGetDescriptionTasks() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/tasks");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            HashMap<Integer, Task> map = gson.fromJson(response.body()
+                    , new TypeToken<HashMap<Integer, Task>>() {
+                    }.getType());
+            int sise = map.size();
+            assertEquals(2, sise);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testGetDescriptionTasks ");
+        }
+    }
+
+    @Test
+    void testGetDescriptionEpics() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/epics");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            HashMap<Integer, Epic> map = gson.fromJson(response.body()
+                    , new TypeToken<HashMap<Integer, Epic>>() {
+                    }.getType());
+            int sise = map.size();
+            assertEquals(2, sise);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testGetDescriptionEpics ");
+        }
+    }
+
+    @Test
+    void testGetDescriptionSubTasksByEpic() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/subtasks?id=3");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            ArrayList<SubTask> map = gson.fromJson(response.body()
+                    , new TypeToken<ArrayList<SubTask>>() {
+                    }.getType());
+            int sise = map.size();
+            assertEquals(2, sise);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в testGetDescriptionSubTasksByEpic ");
+        }
+    }
+
+    @Test
+    void testGetHistory() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/history");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            ArrayList<Task> list = gson.fromJson(response.body(), new TypeToken<ArrayList<Task>>() {
+            }.getType());
+            int sise = list.size();
+            assertEquals(3, sise);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testGetHistory ");
+        }
+    }
+
+    @Test
+    void testGetPrioritizedTasks() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/tasksort");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            Set<Task> map = gson.fromJson(response.body()
+                    , new TypeToken<Set<Task>>() {
+                    }.getType());
+            int sise = map.size();
+            assertEquals(4, sise);
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testGetPrioritizedTasks ");
+        }
+    }
+
+    @Test
+    void testDeleteTaskById() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/task?id=1");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .DELETE()
+                    .version((HttpClient.Version.HTTP_1_1))
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode(), "Задача не удалена");
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testDeleteTaskById ");
+        }
+    }
+
+    @Test
+    void testDeleteAllTasks() {
+        try {
+            URI uri = URI.create("http://localhost:8080/tasks/tasks");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .DELETE()
+                    .version((HttpClient.Version.HTTP_1_1))
+                    .uri(uri)
+                    .build();
+            HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+            response = client.send(request, handler);
+            assertEquals(200, response.statusCode(), "Задача не удалена");
+        } catch (IOException | InterruptedException ex) {
+            System.out.println(ex.getMessage() + "Исключение в методе testDeleteAllTasks ");
+        }
+    }
+
+    static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
         // задаём формат выходных данных: "dd--MM--yyyy"
-        private final DateTimeFormatter formatterWriter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh.mm.ss");
-        private final DateTimeFormatter formatterReader = DateTimeFormatter.ofPattern("dd.MM.yyyy hh.mm.ss");
+        private final DateTimeFormatter formatterWriter
+                = DateTimeFormatter.ofPattern("yyyy.MM.dd HH.mm.ss");
+        private final DateTimeFormatter formatterReader
+                = DateTimeFormatter.ofPattern("yyyy.MM.dd HH.mm.ss");
 
         @Override
-        public void write(final JsonWriter jsonWriter, final LocalDateTime startTime) throws IOException {
+        public void write(final JsonWriter jsonWriter
+                , final LocalDateTime startTime) throws IOException {
             // приводим localDate к необходимому формату
-            jsonWriter.value(startTime.format(formatterWriter));
+            try {
+                jsonWriter.value(startTime.format(formatterWriter));
+            } catch (NullPointerException ex) {
+                System.out.println("Вылетел нулл в адаптере записи");
+            } catch (DateTimeParseException ex) {
+                System.out.println("Вылетел нулл 00 в адаптере записи");
+            }
         }
 
         @Override
         public LocalDateTime read(final JsonReader jsonReader) throws IOException {
-            return LocalDateTime.parse(jsonReader.nextString(), formatterReader);
+            LocalDateTime r = null;
+            try {
+                r = LocalDateTime.parse(jsonReader.nextString(), formatterReader);
+            } catch (NullPointerException ex) {
+                System.out.println("Вылетел нулл 1 в адаптере");
+            } catch (DateTimeParseException ex) {
+                System.out.println("Вылетел нулл 11 в адаптере записи");
+            }
+            return r;
         }
     }
 
-    class LocalDateTimeAdapter1 extends TypeAdapter<LocalDateTime> {
+    static class LocalDateTimeAdapter1 extends TypeAdapter<LocalDateTime> {
         // задаём формат выходных данных: "dd--MM--yyyy"
-        private final DateTimeFormatter formatterWriter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh.mm.ss");
-        private final DateTimeFormatter formatterReader = DateTimeFormatter.ofPattern("dd.MM.yyyy hh.mm.ss");
+        private final DateTimeFormatter formatterWriter
+                = DateTimeFormatter.ofPattern("yyyy.MM.dd HH.mm.ss");
+        private final DateTimeFormatter formatterReader
+                = DateTimeFormatter.ofPattern("yyyy.MM.dd HH.mm.ss");
 
         @Override
-        public void write(final JsonWriter jsonWriter, final LocalDateTime endTime) throws IOException {
+        public void write(final JsonWriter jsonWriter
+                , final LocalDateTime endTime) throws IOException {
             // приводим localDate к необходимому формату
-            jsonWriter.value(endTime.format(formatterWriter));
+            try {
+                jsonWriter.value(endTime.format(formatterWriter));
+            } catch (NullPointerException ex) {
+                System.out.println("Вылетел нулл 3 в адаптере записи");
+            } catch (DateTimeParseException ex) {
+                System.out.println("Вылетел нулл 13 в адаптере записи");
+            }
         }
 
         @Override
         public LocalDateTime read(final JsonReader jsonReader) throws IOException {
-            return LocalDateTime.parse(jsonReader.nextString(), formatterReader);
-        }
-    }
-
-    class DurationAdapter extends TypeAdapter<Duration> {
-
-        @Override
-        public void write(final JsonWriter jsonWriter, final Duration duration) throws IOException {
-            jsonWriter.value(duration.toString());
-        }
-
-        @Override
-        public Duration read(final JsonReader jsonReader) throws IOException {
-            return Duration.ofMinutes(58);
+            LocalDateTime r = null;
+            try {
+                r = LocalDateTime.parse(jsonReader.nextString(), formatterReader);
+            } catch (NullPointerException ex) {
+                System.out.println("Вылетел нулл 2 в адаптере");
+            } catch (DateTimeParseException ex) {
+                System.out.println("Вылетел нулл 12 в адаптере записи");
+            }
+            return r;
         }
     }
 }

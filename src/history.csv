@@ -1,10 +1,12 @@
 type,name,description,status,id,duration,startTime,biEpic
-TASK,name,description,NEW,0,10,2022-07-07T08:22:25
-TASK,name,description,DONE,5,10,2022-07-08T08:22:25
-TASK,name,description,NEW,6,10,2022-07-09T08:22:25
-EPIC,name,description,IN_PROGRESS,1,220,2022-09-10T08:22:25
-EPIC,
-SUBTASK,name,description,NEW,3,20,2022-09-10T08:22:25,1
-SUBTASK,name,description,DONE,4,20,2022-10-11T08:22:25,1
+TASK,name,description,NEW,0,10,2022-06-03T08:22:25
+TASK,name,description,NEW,4,10,2022-06-04T08:22:25
+TASK,name,description,NEW,5,10,2022-05-28T08:22:25
+EPIC,name,description,DONE,1,20,2022-09-05T08:22:25
+EPIC,name,description,DONE,6,20,2022-10-05T18:22:25
+SUBTASK,name,description,DONE,2,10,2022-09-05T08:22:25,1
+SUBTASK,name,description,DONE,3,10,2022-10-05T08:22:25,1
+SUBTASK,name,description,DONE,7,10,2022-10-05T18:22:25,6
+SUBTASK,name,description,DONE,8,10,2022-10-05T23:22:25,6
 
-0,5
+0,5,1,6,3,2,4
